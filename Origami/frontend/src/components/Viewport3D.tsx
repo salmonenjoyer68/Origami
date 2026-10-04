@@ -147,7 +147,7 @@ export function Viewport3D({
       </div>
 
       {/* Canvas */}
-      <div className="relative flex-1 min-h-[320px] bg-[radial-gradient(ellipse_at_center,#1a1a22_0%,#070709_70%)]">
+      <div className="relative flex-1 min-h-0 bg-[radial-gradient(ellipse_at_center,#1a1a22_0%,#070709_70%)]">
         <DynamicModelViewer
           modelUrl={modelUrl}
           isLoading={isLoading}

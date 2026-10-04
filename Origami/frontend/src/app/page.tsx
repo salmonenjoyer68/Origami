@@ -1,14 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Navbar } from "../components/site/Navbar";
-import { Hero } from "../components/site/Hero";
-import { HowItWorks } from "../components/site/HowItWorks";
-import { StudioSection } from "../components/site/StudioSection";
-import { Features } from "../components/site/Features";
-import { Gallery } from "../components/site/Gallery";
-import { FAQ } from "../components/site/FAQ";
-import { CTA, Footer } from "../components/site/Footer";
+import { StudioHeader } from "../components/StudioHeader";
+import { DrawingCanvas } from "../components/DrawingCanvas";
+import { Viewport3D } from "../components/Viewport3D";
+import { GuideDrawer } from "../components/GuideDrawer";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -29,7 +25,7 @@ function base64ToBlobUrl(base64Data: string): string {
   return URL.createObjectURL(new Blob([bytes], { type: "model/gltf-binary" }));
 }
 
-export default function OrigamiPage() {
+export default function OrigamiStudioPage() {
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,10 +37,11 @@ export default function OrigamiPage() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [backendOnline, setBackendOnline] = useState<boolean | null>(null);
   const [presetRequest, setPresetRequest] = useState<{ id: string; nonce: number } | null>(null);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const blobUrlRef = useRef<string | null>(null);
 
-  // Backend health check on mount
+  // Health check
   useEffect(() => {
     let mounted = true;
     fetch(`${API_BASE}/api/health`)
@@ -63,7 +60,7 @@ export default function OrigamiPage() {
     return () => clearInterval(t);
   }, [isLoading]);
 
-  // Revoke the last Blob URL on unmount
+  // Clean up blob url on unmount
   useEffect(() => () => {
     if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
   }, []);
@@ -123,11 +120,6 @@ export default function OrigamiPage() {
     [prompt, removeBackground]
   );
 
-  const handlePickPreset = useCallback((id: string) => {
-    setPresetRequest({ id, nonce: Date.now() });
-    document.getElementById("studio")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, []);
-
   const handleLoadSample = useCallback(() => {
     setModelUrl("/samples/sample_model.glb");
     setDetectedLabel("Origami Crane Demo");
@@ -137,35 +129,75 @@ export default function OrigamiPage() {
   }, []);
 
   return (
-    <div className="page-bg min-h-screen">
-      <Navbar backendOnline={backendOnline} />
-      <main>
-        <Hero />
-        <HowItWorks />
-        <StudioSection
-          onGenerate={handleGenerate3D}
-          isLoading={isLoading}
-          prompt={prompt}
-          setPrompt={setPrompt}
-          removeBackground={removeBackground}
-          setRemoveBackground={setRemoveBackground}
-          presetRequest={presetRequest}
-          modelUrl={modelUrl}
-          detectedLabel={detectedLabel}
-          inferenceTime={inferenceTime}
-          elapsedSeconds={elapsedSeconds}
-          error={error}
-          onDismissError={() => setError(null)}
-          isPreview={isPreview}
-          onDismissPreview={() => setIsPreview(false)}
-          onLoadSample={handleLoadSample}
-        />
-        <Features />
-        <Gallery onPick={handlePickPreset} />
-        <FAQ />
-        <CTA />
+    <div className="h-screen w-screen flex flex-col bg-studio-950 text-zinc-100 overflow-hidden font-sans">
+      {/* Header */}
+      <StudioHeader
+        backendOnline={backendOnline}
+        onLoadSample={handleLoadSample}
+        onOpenGuide={() => setIsGuideOpen(true)}
+      />
+
+      {/* Status / Alert Banners */}
+      {(error || isPreview) && (
+        <div className="shrink-0 px-4 py-2 text-xs flex items-center justify-between gap-3 border-b border-white/[0.08] bg-black/40 backdrop-blur z-20">
+          {error && (
+            <div className="flex items-center gap-2 text-rose-300">
+              <span className="font-semibold text-rose-400">Error:</span>
+              <span className="truncate">{error}</span>
+            </div>
+          )}
+          {!error && isPreview && (
+            <div className="flex items-center gap-2 text-amber-300">
+              <span className="font-semibold text-amber-400">Notice:</span>
+              <span>GPU queue is busy, displaying preview demo mesh. Real generation will retry when queue clears.</span>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setError(null);
+              setIsPreview(false);
+            }}
+            className="icon-btn !h-6 !px-2 text-[11px] text-zinc-400 hover:text-white"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Main Studio Dual-Pane Viewport */}
+      <main className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-white/[0.08] overflow-hidden">
+        {/* Left Column: 2D Canvas */}
+        <div className="h-full min-h-0 overflow-hidden">
+          <DrawingCanvas
+            onGenerate={handleGenerate3D}
+            isLoading={isLoading}
+            prompt={prompt}
+            setPrompt={setPrompt}
+            removeBackground={removeBackground}
+            setRemoveBackground={setRemoveBackground}
+            presetRequest={presetRequest}
+          />
+        </div>
+
+        {/* Right Column: 3D Viewport */}
+        <div className="h-full min-h-0 overflow-hidden">
+          <Viewport3D
+            modelUrl={modelUrl}
+            isLoading={isLoading}
+            detectedLabel={detectedLabel}
+            inferenceTime={inferenceTime}
+            elapsedSeconds={elapsedSeconds}
+            onLoadSample={handleLoadSample}
+          />
+        </div>
       </main>
-      <Footer />
+
+      {/* Slide-over Guide & FAQ Drawer */}
+      <GuideDrawer
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+      />
     </div>
   );
 }

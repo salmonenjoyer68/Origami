@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1480 512" width="100%" height="100%">
+  <style>
+    :root { color: #0F172A; }
+    @media (prefers-color-scheme: dark) {
+      :root { color: #F8FAFC; }
+    }
+  </style>
+
+  <!-- Icon Mark (Left) -->
+  <g transform="translate(16, 0)">
+    <!-- Left Side: 2D Flat Sheet (Outlines & Creases) -->
+    <polygon points="256,76 76,256 256,436" fill="none" stroke="currentColor" stroke-width="15" stroke-linejoin="round" stroke-linecap="round"/>
+    
+    <!-- Crease 1: Center horizontal crease directly connecting to the central fold vertex -->
+    <line x1="76" y1="256" x2="256" y2="256" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-dasharray="16 12"/>
+    <!-- Crease 2: Upper diagonal crease connecting mid-edge to Facet 1 boundary -->
+    <line x1="166" y1="166" x2="256" y2="180" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>
+    <!-- Crease 3: Lower diagonal crease connecting mid-edge to Facet 4 boundary -->
+    <line x1="166" y1="346" x2="256" y2="332" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>
+
+    <!-- Right Side: 3D Faceted Folded Cube Volume (4 Tones of Electric Indigo) -->
+    <!-- Facet 1: Top Plane (Soft Indigo) -->
+    <polygon points="256,76 416,148 340,226 256,180" fill="#818CF8"/>
+    <!-- Facet 2: Front Plane (Vibrant Indigo) -->
+    <polygon points="256,180 340,226 340,346 256,256" fill="#6366F1"/>
+    <!-- Facet 3: Right Side Plane (Rich Indigo) -->
+    <polygon points="340,226 436,184 436,304 340,346" fill="#4F46E5"/>
+    <!-- Facet 4: Lower Base Crease Plane (Deep Indigo) -->
+    <polygon points="256,256 340,346 256,436" fill="#3730A3"/>
+
+    <!-- Central Spine Fold Line -->
+    <line x1="256" y1="76" x2="256" y2="436" stroke="currentColor" stroke-width="15" stroke-linecap="round"/>
+  </g>
+
+  <!-- Wordmark "Origami" in Geometric Sans-Serif Vector Paths (Right) -->
+  <path d="
+    M 640 158
+    A 76 76 0 1 1 639.9 158 Z
+    M 640 180
+    A 54 54 0 1 0 640.1 180 Z
+    
+    M 746 202
+    H 768
+    V 230
+    C 776 212, 794 202, 818 202
+    V 226
+    C 796 226, 768 238, 768 270
+    V 312
+    H 746
+    Z
+    
+    M 860 157
+    A 11 11 0 1 1 859.9 157 Z
+    M 849 202
+    H 871
+    V 312
+    H 849
+    Z
+    
+    M 944 202
+    C 974 202, 997 224, 999 252
+    V 338
+    C 999 358, 980 368, 952 368
+    H 922
+    V 346
+    H 948
+    C 966 346, 977 338, 977 324
+    V 305
+    C 968 310, 957 312, 944 312
+    C 913 312, 889 288, 889 257
+    C 889 226, 913 202, 944 202 Z
+    M 944 224
+    C 926 224, 911 239, 911 257
+    C 911 275, 926 290, 944 290
+    C 962 290, 977 275, 977 257
+    C 977 239, 962 224, 944 224 Z
+    
+    M 1066 202
+    C 1096 202, 1119 224, 1121 252
+    V 312
+    H 1099
+    V 301
+    C 1090 308, 1079 312, 1066 312
+    C 1035 312, 1011 288, 1011 257
+    C 1011 226, 1035 202, 1066 202 Z
+    M 1066 224
+    C 1048 224, 1033 239, 1033 257
+    C 1033 275, 1048 290, 1066 290
+    C 1084 290, 1099 275, 1099 257
+    C 1099 239, 1084 224, 1066 224 Z
+    
+    M 1144 312
+    V 202
+    H 1166
+    C 1176 202, 1196 202, 1216 216
+    C 1228 202, 1248 202, 1268 202
+    C 1294 202, 1310 218, 1310 248
+    V 312
+    H 1288
+    V 250
+    C 1288 234, 1278 224, 1264 224
+    C 1248 224, 1238 235, 1238 254
+    V 312
+    H 1216
+    V 250
+    C 1216 234, 1206 224, 1192 224
+    C 1176 224, 1166 235, 1166 254
+    V 312
+    H 1144
+    Z
+    
+    M 1368 157
+    A 11 11 0 1 1 1367.9 157 Z
+    M 1357 202
+    H 1379
+    V 312
+    H 1357
+    Z
+  " fill="currentColor" fill-rule="evenodd"/>
+</svg>

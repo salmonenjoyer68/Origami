@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <style>
+    :root { color: #0F172A; }
+    @media (prefers-color-scheme: dark) {
+      :root { color: #F8FAFC; }
+    }
+  </style>
+
+  <!-- Left Side: 2D Flat Sheet (Outlines & Creases) -->
+  <polygon points="256,76 76,256 256,436" fill="none" stroke="currentColor" stroke-width="15" stroke-linejoin="round" stroke-linecap="round"/>
+  
+  <!-- Crease 1: Center horizontal crease directly connecting to the central fold vertex -->
+  <line x1="76" y1="256" x2="256" y2="256" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-dasharray="16 12"/>
+  <!-- Crease 2: Upper diagonal crease connecting mid-edge to Facet 1 boundary -->
+  <line x1="166" y1="166" x2="256" y2="180" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>
+  <!-- Crease 3: Lower diagonal crease connecting mid-edge to Facet 4 boundary -->
+  <line x1="166" y1="346" x2="256" y2="332" stroke="currentColor" stroke-width="11" stroke-linecap="round"/>
+
+  <!-- Right Side: 3D Faceted Folded Cube Volume (4 Tones of Electric Indigo) -->
+  <!-- Facet 1: Top Plane (Soft Indigo) -->
+  <polygon points="256,76 416,148 340,226 256,180" fill="#818CF8"/>
+  <!-- Facet 2: Front Plane (Vibrant Indigo) -->
+  <polygon points="256,180 340,226 340,346 256,256" fill="#6366F1"/>
+  <!-- Facet 3: Right Side Plane (Rich Indigo) -->
+  <polygon points="340,226 436,184 436,304 340,346" fill="#4F46E5"/>
+  <!-- Facet 4: Lower Base Crease Plane (Deep Indigo) -->
+  <polygon points="256,256 340,346 256,436" fill="#3730A3"/>
+
+  <!-- Central Spine Fold Line -->
+  <line x1="256" y1="76" x2="256" y2="436" stroke="currentColor" stroke-width="15" stroke-linecap="round"/>
+</svg>

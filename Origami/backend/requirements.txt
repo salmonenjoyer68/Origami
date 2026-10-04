@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+gradio_client
+google-genai
+Pillow
+python-multipart
+pytest
+httpx
+python-dotenv

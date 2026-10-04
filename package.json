@@ -1,0 +1,14 @@
+{
+  "name": "origami-workspace",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Root workspace proxy for Origami AI Studio",
+  "scripts": {
+    "dev": "npm --prefix Origami/frontend run dev",
+    "build": "npm --prefix Origami/frontend run build",
+    "start": "npm --prefix Origami/frontend run start",
+    "lint": "npm --prefix Origami/frontend run lint",
+    "backend": "Origami\\.venv\\Scripts\\uvicorn app.main:app --app-dir Origami/backend --reload --port 8000",
+    "test:backend": "cd Origami/backend && pytest tests/ -v"
+  }
+}

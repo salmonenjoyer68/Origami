@@ -30,8 +30,31 @@ Origami is a full-stack AI 2D-to-3D creative studio that turns hand-drawn sketch
 
 ## Quick Start
 
-### 1. Backend Setup (FastAPI)
+### Option A: One-Click Launcher (Windows)
+Double-click `run-studio.bat` or run in PowerShell:
+```powershell
+.\run-studio.ps1
+```
+This automatically launches both the FastAPI backend and Next.js frontend, and opens `http://localhost:3000` in your browser.
 
+---
+
+### Option B: From the Project Root Terminal
+You can run Next.js directly from the project root:
+```bash
+# Start frontend studio
+npm run dev
+
+# Run automated backend test suite
+npm run test:backend
+```
+Open `http://localhost:3000` in your browser.
+
+---
+
+### Option C: Manual Setup (Separate Terminals)
+
+#### 1. Backend Setup (FastAPI)
 ```bash
 cd Origami/backend
 
@@ -49,8 +72,7 @@ cp .env.example .env
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 2. Frontend Setup (Next.js Studio)
-
+#### 2. Frontend Setup (Next.js Studio)
 ```bash
 cd Origami/frontend
 

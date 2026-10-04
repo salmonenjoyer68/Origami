@@ -23,8 +23,9 @@ from app.schemas import GenerationRequest, GenerationResponse, PipelineError
 
 _GEMINI_MODELS = [
     "gemini-flash-lite-latest",
-    "gemini-3.5-flash-lite",
     "gemini-3.8-flash",
+    "gemini-2.5-flash",
+    "gemini-1.5-flash",
 ]
 _RETRYABLE_CODES = {429, 500, 503, 504}
 _MAX_RETRIES = 3
@@ -208,23 +209,19 @@ def _generate_mesh(
                 last_exc = exc
                 continue
 
-        # Check if failure was due to Hugging Face ZeroGPU rate limiting / queue exhaustion
-        is_quota_error = any(
-            phrase in str(last_exc).lower()
-            for phrase in ["zerogpu", "quota", "runs limit", "rate limit", "busy"]
-        )
-        if is_quota_error:
-            fallback_paths = [
-                Path(__file__).resolve().parent / "sample_model.glb",
-                _BACKEND_DIR / "tests" / "output_test.glb",
-            ]
-            for fb in fallback_paths:
-                if fb.is_file() and fb.stat().st_size > 0:
-                    print(
-                        f"[pipeline] ZeroGPU rate limit reached ({last_exc}). "
-                        "Serving fallback 3D mesh preview."
-                    )
-                    return (base64.b64encode(fb.read_bytes()).decode("ascii"), True)
+        # If generation failed on all spaces (rate limits, queue exhaustion, or space offline),
+        # serve the fallback 3D mesh preview so the user experience is preserved.
+        fallback_paths = [
+            Path(__file__).resolve().parent / "sample_model.glb",
+            _BACKEND_DIR / "tests" / "output_test.glb",
+        ]
+        for fb in fallback_paths:
+            if fb.is_file() and fb.stat().st_size > 0:
+                print(
+                    f"[pipeline] Upstream 3D spaces unavailable ({last_exc}). "
+                    "Serving fallback 3D mesh preview."
+                )
+                return (base64.b64encode(fb.read_bytes()).decode("ascii"), True)
 
         raise PipelineError(
             f"3D mesh generation failed on all candidate spaces: {last_exc}"

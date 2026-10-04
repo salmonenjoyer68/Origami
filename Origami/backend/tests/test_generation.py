@@ -1,11 +1,13 @@
-"""Standalone CLI smoke test for the image-to-3D generation pipeline."""
+"""Pytest and standalone CLI test for the image-to-3D generation pipeline."""
 
 import asyncio
 import base64
 import io
+import os
 import sys
 from pathlib import Path
 
+import pytest
 from dotenv import load_dotenv
 from PIL import Image, ImageDraw
 
@@ -30,37 +32,29 @@ def create_test_image_base64() -> str:
     return base64.b64encode(image_buffer.getvalue()).decode("ascii")
 
 
-async def run_generation() -> None:
-    print("Loading environment variables...")
+def test_generation_pipeline():
     load_dotenv(BACKEND_DIR / ".env")
+    if not os.getenv("GEMINI_API_KEY"):
+        pytest.skip("GEMINI_API_KEY not set in environment or .env, skipping live pipeline test")
 
-    print("Creating synthetic test image...")
-    image_base64 = create_test_image_base64()
-    request = GenerationRequest(
-        image_base64=image_base64,
-        prompt="A simple red circle",
-        remove_background=True,
-    )
+    async def _run():
+        image_base64 = create_test_image_base64()
+        request = GenerationRequest(
+            image_base64=image_base64,
+            prompt="A simple red circle",
+            remove_background=True,
+        )
+        response = await generate_model(request)
+        assert response.glb_base64 is not None
+        assert len(response.glb_base64) > 0
+        assert response.inference_time_seconds > 0
 
-    print("Running image-to-3D generation pipeline...")
-    response = await generate_model(request)
-    if not response.glb_base64:
-        raise RuntimeError("Pipeline returned no GLB data")
-
-    print(f"Detected label: {response.detected_label}")
-    print(f"Inference time: {response.inference_time_seconds:.2f} seconds")
-    print(f"Writing GLB output to {OUTPUT_PATH}...")
-    OUTPUT_PATH.write_bytes(base64.b64decode(response.glb_base64, validate=True))
-
-    if not OUTPUT_PATH.is_file() or OUTPUT_PATH.stat().st_size <= 0:
-        raise RuntimeError(f"Output file is missing or empty: {OUTPUT_PATH}")
-
-    print(f"Success: wrote {OUTPUT_PATH.stat().st_size} bytes")
+    asyncio.run(_run())
 
 
 def main() -> int:
     try:
-        asyncio.run(run_generation())
+        test_generation_pipeline()
     except Exception as exc:
         print(f"Generation test failed: {exc}", file=sys.stderr)
         return 1

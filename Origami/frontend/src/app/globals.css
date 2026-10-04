@@ -6,10 +6,179 @@
   color-scheme: dark;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
-  background: #09090b;
-  color: #fafafa;
+  background-color: #070709;
+  color: #f4f4f5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* Visible, consistent keyboard focus */
+:focus-visible {
+  outline: 2px solid #818cf8;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070709;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+@layer components {
+  .section {
+    @apply relative max-w-6xl mx-auto px-5 sm:px-8 py-20 sm:py-28;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-300;
+  }
+
+  .heading-xl {
+    @apply font-display font-semibold tracking-tight text-4xl sm:text-6xl lg:text-7xl leading-[1.05];
+  }
+
+  .heading-lg {
+    @apply font-display font-semibold tracking-tight text-3xl sm:text-4xl lg:text-5xl leading-[1.1];
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-br from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-brand {
+    @apply bg-gradient-to-r from-brand-300 via-violet-300 to-sky-300 bg-clip-text text-transparent;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full text-sm font-semibold text-white
+      bg-gradient-to-b from-brand-500 to-brand-600 shadow-glow
+      hover:from-brand-400 hover:to-brand-500 active:scale-[0.98] transition-all;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full text-sm font-medium text-zinc-200
+      bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:text-white active:scale-[0.98] transition-all;
+  }
+
+  .card {
+    @apply rounded-2xl border border-white/[0.07] bg-gradient-to-b from-white/[0.04] to-white/[0.01] shadow-card;
+  }
+
+  .icon-btn {
+    @apply inline-flex items-center justify-center h-8 min-w-8 px-2 rounded-lg text-zinc-400
+      hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:pointer-events-none transition-colors;
+  }
+
+  .segmented {
+    @apply inline-flex items-center gap-0.5 p-0.5 rounded-lg bg-black/30 border border-white/[0.06];
+  }
+
+  .segmented > button {
+    @apply h-7 px-2.5 rounded-md text-xs font-medium text-zinc-400 hover:text-zinc-100 transition-colors;
+  }
+
+  .segmented > button[data-active="true"] {
+    @apply bg-white/[0.1] text-white shadow-sm;
+  }
+}
+
+/* Glassmorphic Panel utility */
+.glass-panel {
+  background: rgba(19, 19, 24, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Page background: hero glow + faint dot grid */
+.page-bg {
+  background:
+    radial-gradient(60% 50% at 50% 0%, rgba(99, 102, 241, 0.18) 0%, transparent 70%),
+    radial-gradient(40% 30% at 85% 20%, rgba(168, 85, 247, 0.10) 0%, transparent 70%),
+    #070709;
+}
+
+.dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+/* Grid Pattern for Canvas Background */
+.canvas-grid-bg {
+  background-color: #ffffff;
+  background-image: linear-gradient(rgba(240, 240, 245, 0.8) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(240, 240, 245, 0.8) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Shimmer Button Effect */
+.btn-shimmer {
+  background-size: 200% auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-shimmer:hover {
+  background-position: right center;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* FAQ accordion marker removal */
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

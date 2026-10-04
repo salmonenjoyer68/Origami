@@ -49,6 +49,7 @@ yarn-error.log*
 .next/
 out/
 .vercel
+*.tsbuildinfo
 
 # 3D assets & large binary models
 *.glb

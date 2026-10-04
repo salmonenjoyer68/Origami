@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
+import { PRESETS, STYLE_CHIPS, PresetItem } from "./presets";
 
 interface DrawingCanvasProps {
   onGenerate: (imageSrc: string) => void;
@@ -9,21 +10,26 @@ interface DrawingCanvasProps {
   setPrompt: (value: string) => void;
   removeBackground: boolean;
   setRemoveBackground: (value: boolean) => void;
+  /** External request (e.g. from the Gallery) to load a preset. `nonce` makes repeat picks fire. */
+  presetRequest?: { id: string; nonce: number } | null;
 }
 
-const COLORS = [
-  { label: "Black", value: "#000000" },
-  { label: "Dark Gray", value: "#4b5563" },
-  { label: "Red", value: "#ef4444" },
-  { label: "Blue", value: "#3b82f6" },
-  { label: "Green", value: "#10b981" },
-  { label: "Eraser", value: "#ffffff" },
+type ToolType = "pen" | "highlighter" | "eraser";
+
+const PALETTE = [
+  { label: "Onyx", value: "#18181b" },
+  { label: "Indigo", value: "#6366f1" },
+  { label: "Purple", value: "#a855f7" },
+  { label: "Sky", value: "#0ea5e9" },
+  { label: "Emerald", value: "#10b981" },
+  { label: "Amber", value: "#f59e0b" },
+  { label: "Rose", value: "#f43f5e" },
 ];
 
-const BRUSH_SIZES = [
-  { label: "Fine", size: 4 },
-  { label: "Medium", size: 8 },
-  { label: "Thick", size: 16 },
+const TOOLS: { id: ToolType; label: string; icon: string }[] = [
+  { id: "pen", label: "Pen", icon: "M15.232 5.232l3.536 3.536M4 20l4.5-1 10-10a2.5 2.5 0 00-3.536-3.536l-10 10L4 20z" },
+  { id: "highlighter", label: "Shade", icon: "M9 11l-5 5v4h4l5-5M14 6l4 4M12.5 7.5l4 4L20 8l-4-4-3.5 3.5z" },
+  { id: "eraser", label: "Eraser", icon: "M20 20H9l-5-5a2 2 0 010-2.83l8.17-8.17a2 2 0 012.83 0l5 5a2 2 0 010 2.83L13 19M7 12l6 6" },
 ];
 
 export function DrawingCanvas({
@@ -33,19 +39,39 @@ export function DrawingCanvas({
   setPrompt,
   removeBackground,
   setRemoveBackground,
+  presetRequest,
 }: DrawingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const isDrawingRef = useRef<boolean>(false);
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
 
-  const [color, setColor] = useState<string>("#000000");
+  const [tool, setTool] = useState<ToolType>("pen");
+  const [color, setColor] = useState<string>("#18181b");
   const [brushSize, setBrushSize] = useState<number>(8);
   const [history, setHistory] = useState<ImageData[]>([]);
   const [hasDrawn, setHasDrawn] = useState<boolean>(false);
+  const [activePreset, setActivePreset] = useState<string | null>(null);
+  const [isDraggingOver, setIsDraggingOver] = useState<boolean>(false);
 
-  // Initialize and resize canvas with high-DPI awareness and solid white background
-  const initCanvas = useCallback(() => {
+  const getCtx = () => canvasRef.current?.getContext("2d", { willReadFrequently: true }) ?? null;
+
+  const pushSnapshot = useCallback(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d", { willReadFrequently: true });
+    if (!canvas || !ctx) return;
+    const snap = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    setHistory((prev) => [...prev.slice(-24), snap]);
+  }, []);
+
+  /**
+   * Size the canvas to its container at device pixel ratio.
+   * When `preserve` is true, the existing drawing is redrawn after resizing
+   * instead of being wiped (previous behaviour cleared the canvas on every resize).
+   */
+  const sizeCanvas = useCallback((preserve: boolean) => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
@@ -53,258 +79,355 @@ export function DrawingCanvas({
     const rect = container.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return;
 
+    let backup: HTMLCanvasElement | null = null;
+    let prevCssW = 0;
+    let prevCssH = 0;
+    if (preserve && canvas.width > 0 && canvas.height > 0) {
+      backup = document.createElement("canvas");
+      backup.width = canvas.width;
+      backup.height = canvas.height;
+      backup.getContext("2d")?.drawImage(canvas, 0, 0);
+      const dprPrev = window.devicePixelRatio || 1;
+      prevCssW = canvas.width / dprPrev;
+      prevCssH = canvas.height / dprPrev;
+    }
+
     const dpr = window.devicePixelRatio || 1;
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
 
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
-
-    ctx.scale(dpr, dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, rect.width, rect.height);
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
-    // Initial state for history
-    const initialData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    setHistory([initialData]);
-    setHasDrawn(false);
+    if (backup) {
+      // Keep the drawing centred at its original size.
+      const dx = (rect.width - prevCssW) / 2;
+      const dy = (rect.height - prevCssH) / 2;
+      ctx.drawImage(backup, dx, dy, prevCssW, prevCssH);
+    }
+
+    setHistory([ctx.getImageData(0, 0, canvas.width, canvas.height)]);
   }, []);
 
   useEffect(() => {
-    initCanvas();
-
-    const handleResize = () => {
-      // Re-init on window resize
-      initCanvas();
+    sizeCanvas(false);
+    let raf = 0;
+    const onResize = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => sizeCanvas(true));
     };
+    window.addEventListener("resize", onResize);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onResize);
+    };
+  }, [sizeCanvas]);
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [initCanvas]);
+  const handleGenerate = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || isLoading || !hasDrawn) return;
+    onGenerate(canvas.toDataURL("image/png"));
+  }, [isLoading, hasDrawn, onGenerate]);
 
-  // Extract relative coordinates inside canvas
+  // Ctrl/Cmd + Enter → generate. Depends on handleGenerate so it always uses the current prompt.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        handleGenerate();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [handleGenerate]);
+
   const getCoordinates = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ): { x: number; y: number } => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
-
     if ("touches" in e) {
-      const touch = e.touches[0];
-      return {
-        x: touch.clientX - rect.left,
-        y: touch.clientY - rect.top,
-      };
+      const t = e.touches[0];
+      return { x: t.clientX - rect.left, y: t.clientY - rect.top };
     }
-
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    };
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   };
 
-  // Start Drawing
+  const strokeWidth = tool === "pen" ? brushSize : brushSize * 2.5;
+
+  const applyBrush = (ctx: CanvasRenderingContext2D) => {
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.lineWidth = strokeWidth;
+    ctx.strokeStyle = tool === "eraser" ? "#ffffff" : color;
+    ctx.globalAlpha = tool === "highlighter" ? 0.35 : 1;
+  };
+
   const startDrawing = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
     if (isLoading) return;
-    isDrawingRef.current = true;
-    const coords = getCoordinates(e);
-    lastPointRef.current = coords;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d", { willReadFrequently: true });
+    const ctx = getCtx();
     if (!ctx) return;
-
-    ctx.strokeStyle = color;
-    ctx.lineWidth = brushSize;
+    isDrawingRef.current = true;
+    const p = getCoordinates(e);
+    lastPointRef.current = p;
+    applyBrush(ctx);
     ctx.beginPath();
-    ctx.arc(coords.x, coords.y, brushSize / 2, 0, Math.PI * 2);
-    ctx.fillStyle = color;
+    ctx.arc(p.x, p.y, strokeWidth / 2, 0, Math.PI * 2);
+    ctx.fillStyle = tool === "eraser" ? "#ffffff" : color;
     ctx.fill();
     setHasDrawn(true);
+    setActivePreset(null);
   };
 
-  // Draw
   const draw = (
-    e:
-      | React.MouseEvent<HTMLCanvasElement>
-      | React.TouchEvent<HTMLCanvasElement>
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
     if (!isDrawingRef.current || !lastPointRef.current || isLoading) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d", { willReadFrequently: true });
+    const ctx = getCtx();
     if (!ctx) return;
-
-    const coords = getCoordinates(e);
-
-    ctx.strokeStyle = color;
-    ctx.lineWidth = brushSize;
+    const p = getCoordinates(e);
+    applyBrush(ctx);
     ctx.beginPath();
     ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
-    ctx.lineTo(coords.x, coords.y);
+    ctx.lineTo(p.x, p.y);
     ctx.stroke();
-
-    lastPointRef.current = coords;
+    lastPointRef.current = p;
   };
 
-  // Stop Drawing & save history snapshot
   const stopDrawing = () => {
     if (!isDrawingRef.current) return;
     isDrawingRef.current = false;
     lastPointRef.current = null;
-
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d", { willReadFrequently: true });
-    if (ctx && canvas) {
-      const currentSnapshot = ctx.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
-      setHistory((prev) => [...prev.slice(-19), currentSnapshot]);
-    }
+    const ctx = getCtx();
+    if (ctx) ctx.globalAlpha = 1;
+    pushSnapshot();
   };
 
-  // Undo last stroke
   const handleUndo = () => {
     if (history.length <= 1 || isLoading) return;
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d", { willReadFrequently: true });
-    if (!ctx || !canvas) return;
-
-    const newHistory = history.slice(0, -1);
-    const previousSnapshot = newHistory[newHistory.length - 1];
-    ctx.putImageData(previousSnapshot, 0, 0);
-    setHistory(newHistory);
-    if (newHistory.length === 1) {
-      setHasDrawn(false);
-    }
+    const ctx = getCtx();
+    if (!ctx) return;
+    const next = history.slice(0, -1);
+    ctx.putImageData(next[next.length - 1], 0, 0);
+    setHistory(next);
+    if (next.length === 1) setHasDrawn(false);
   };
 
-  // Clear Canvas
+  const resetToWhite = (): { ctx: CanvasRenderingContext2D; w: number; h: number } | null => {
+    const ctx = getCtx();
+    const container = containerRef.current;
+    if (!ctx || !container) return null;
+    const rect = container.getBoundingClientRect();
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, rect.width, rect.height);
+    return { ctx, w: rect.width, h: rect.height };
+  };
+
   const handleClear = () => {
     if (isLoading) return;
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d", { willReadFrequently: true });
-    if (!ctx || !canvas) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, rect.width, rect.height);
-
-    const emptySnapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    setHistory([emptySnapshot]);
+    const r = resetToWhite();
+    if (!r || !canvas) return;
+    setHistory([r.ctx.getImageData(0, 0, canvas.width, canvas.height)]);
     setHasDrawn(false);
+    setActivePreset(null);
   };
 
-  // Extract Canvas Base64 & Trigger 3D Generation
-  const handleGenerate = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || isLoading) return;
-    // Extract base64 image (PNG with white background)
-    const dataUrl = canvas.toDataURL("image/png");
-    onGenerate(dataUrl);
+  const loadPreset = useCallback(
+    (preset: PresetItem) => {
+      if (isLoading) return;
+      const r = resetToWhite();
+      if (!r) return;
+      preset.draw(r.ctx, r.w, r.h);
+      r.ctx.globalAlpha = 1;
+      pushSnapshot();
+      setHasDrawn(true);
+      setActivePreset(preset.id);
+      setPrompt(preset.prompt);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isLoading, pushSnapshot, setPrompt]
+  );
+
+  // Respond to external preset requests (Gallery section)
+  useEffect(() => {
+    if (!presetRequest) return;
+    const preset = PRESETS.find((p) => p.id === presetRequest.id);
+    if (preset) loadPreset(preset);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [presetRequest]);
+
+  const addStyleTag = (tag: string) => {
+    if (prompt.toLowerCase().includes(tag)) return;
+    setPrompt(prompt.trim() ? `${prompt.trim()}, ${tag}` : tag);
+  };
+
+  const handleImageFile = (file: File) => {
+    if (!file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        const r = resetToWhite();
+        if (!r) return;
+        const scale = Math.min((r.w * 0.85) / img.width, (r.h * 0.85) / img.height);
+        const nw = img.width * scale;
+        const nh = img.height * scale;
+        r.ctx.drawImage(img, (r.w - nw) / 2, (r.h - nh) / 2, nw, nh);
+        pushSnapshot();
+        setHasDrawn(true);
+        setActivePreset(null);
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDraggingOver(false);
+    const f = e.dataTransfer.files?.[0];
+    if (f) handleImageFile(f);
   };
 
   return (
-    <div className="w-full h-[520px] lg:h-[600px] bg-zinc-950/80 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col shadow-2xl backdrop-blur-sm">
-      {/* Top Header & Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-zinc-900/70 backdrop-blur-md border-b border-zinc-800/80">
-        <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-          <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300">
-            2D Canvas
-          </span>
+    <div className="w-full h-full flex flex-col bg-studio-900 overflow-hidden">
+      {/* Toolbar */}
+      <div className="px-3 h-12 border-b border-white/[0.06] flex items-center justify-between gap-2">
+        <div className="segmented" role="radiogroup" aria-label="Drawing tool">
+          {TOOLS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="radio"
+              aria-checked={tool === t.id}
+              data-active={tool === t.id}
+              title={t.label}
+              onClick={() => setTool(t.id)}
+              className="!px-2 sm:!px-2.5 inline-flex items-center gap-1.5"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={t.icon} />
+              </svg>
+              <span className="hidden xl:inline">{t.label}</span>
+            </button>
+          ))}
         </div>
 
-        {/* Brush Size & Colors */}
-        <div className="flex items-center gap-3">
-          {/* Color Palette */}
-          <div className="flex items-center gap-1.5 bg-zinc-800/80 px-2 py-1 rounded-lg border border-zinc-700/60">
-            {COLORS.map((c) => (
-              <button
-                key={c.value}
-                type="button"
-                title={c.label}
-                onClick={() => setColor(c.value)}
-                style={{ backgroundColor: c.value }}
-                className={`w-4 h-4 rounded-full border transition-transform ${
-                  color === c.value
-                    ? "scale-125 border-indigo-400 ring-2 ring-indigo-500/40"
-                    : "border-zinc-600 hover:scale-110"
-                }`}
-              />
-            ))}
-          </div>
-
-          {/* Brush Sizes */}
-          <div className="hidden sm:flex items-center gap-1 bg-zinc-800/80 p-0.5 rounded-lg border border-zinc-700/60 text-xs">
-            {BRUSH_SIZES.map((b) => (
-              <button
-                key={b.size}
-                type="button"
-                onClick={() => setBrushSize(b.size)}
-                className={`px-2 py-0.5 rounded-md transition-colors ${
-                  brushSize === b.size
-                    ? "bg-indigo-600 text-white font-medium"
-                    : "text-zinc-400 hover:text-zinc-200"
-                }`}
-              >
-                {b.label}
-              </button>
-            ))}
-          </div>
-
-          {/* Undo */}
-          <button
-            type="button"
-            onClick={handleUndo}
-            disabled={history.length <= 1 || isLoading}
-            title="Undo stroke"
-            className="p-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:pointer-events-none border border-zinc-700/60 transition-colors"
-          >
-            <svg
-              className="w-3.5 h-3.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 10h10a5 5 0 015 5v2M3 10l6-6m-6 6l6 6"
-              />
+        <div className="flex items-center gap-1">
+          <button type="button" className="icon-btn" onClick={handleUndo} disabled={history.length <= 1 || isLoading} aria-label="Undo" title="Undo">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3 10h10a5 5 0 015 5v2M3 10l6-6m-6 6l6 6" />
             </svg>
           </button>
-
-          {/* Clear Button */}
+          <button type="button" className="icon-btn" onClick={() => fileInputRef.current?.click()} disabled={isLoading} aria-label="Upload image" title="Upload image">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleImageFile(f);
+              e.target.value = "";
+            }}
+          />
+          <div className="w-px h-5 bg-white/10 mx-1" />
           <button
             type="button"
             onClick={handleClear}
             disabled={!hasDrawn || isLoading}
-            className="px-2.5 py-1 text-xs rounded-lg bg-zinc-800/80 hover:bg-red-500/20 text-zinc-300 hover:text-red-400 border border-zinc-700/60 hover:border-red-500/30 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            className="icon-btn text-xs font-medium hover:!text-rose-300 hover:!bg-rose-500/10"
           >
             Clear
           </button>
         </div>
       </div>
 
-      {/* Drawing Area */}
+      {/* Secondary bar: colour + size */}
+      <div className="px-3 h-11 border-b border-white/[0.04] flex items-center justify-between gap-3 bg-black/20">
+        <div className={`flex items-center gap-1.5 transition-opacity ${tool === "eraser" ? "opacity-30 pointer-events-none" : ""}`}>
+          {PALETTE.map((p) => (
+            <button
+              key={p.value}
+              type="button"
+              title={p.label}
+              aria-label={`Colour ${p.label}`}
+              aria-pressed={color === p.value}
+              onClick={() => setColor(p.value)}
+              style={{ backgroundColor: p.value }}
+              className={`w-5 h-5 rounded-full transition-all ${
+                color === p.value ? "ring-2 ring-offset-2 ring-offset-studio-900 ring-white/80" : "ring-1 ring-white/15 hover:scale-110"
+              }`}
+            />
+          ))}
+          <label className="relative w-5 h-5 rounded-full overflow-hidden ring-1 ring-white/15 cursor-pointer bg-[conic-gradient(red,yellow,lime,cyan,blue,magenta,red)]" title="Custom colour">
+            <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer" aria-label="Custom colour" />
+          </label>
+        </div>
+
+        <label className="flex items-center gap-2 text-xs text-zinc-400">
+          <span
+            className="rounded-full bg-zinc-300 shrink-0"
+            style={{ width: Math.max(4, Math.min(strokeWidth, 18)), height: Math.max(4, Math.min(strokeWidth, 18)) }}
+            aria-hidden="true"
+          />
+          <input
+            type="range"
+            min={2}
+            max={28}
+            value={brushSize}
+            onChange={(e) => setBrushSize(Number(e.target.value))}
+            className="w-20 sm:w-24 accent-brand-500 cursor-pointer"
+            aria-label="Brush size"
+          />
+          <span className="font-mono w-8 text-right text-zinc-500">{brushSize}px</span>
+        </label>
+      </div>
+
+      {/* Presets */}
+      <div className="px-3 py-2 flex items-center gap-1.5 overflow-x-auto border-b border-white/[0.04]">
+        {PRESETS.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            onClick={() => loadPreset(p)}
+            disabled={isLoading}
+            className={`h-7 px-2.5 rounded-full text-xs shrink-0 inline-flex items-center gap-1.5 border transition-colors ${
+              activePreset === p.id
+                ? "bg-brand-500/20 text-brand-200 border-brand-400/40"
+                : "text-zinc-400 border-white/[0.07] hover:text-white hover:border-white/20"
+            }`}
+          >
+            <span aria-hidden="true">{p.emoji}</span>
+            {p.name}
+          </button>
+        ))}
+      </div>
+
+      {/* Canvas */}
       <div
         ref={containerRef}
-        className="relative flex-1 w-full h-full bg-white cursor-crosshair overflow-hidden touch-none"
+        onDragOver={(e) => {
+          e.preventDefault();
+          setIsDraggingOver(true);
+        }}
+        onDragLeave={() => setIsDraggingOver(false)}
+        onDrop={handleDrop}
+        className="relative flex-1 min-h-[280px] canvas-grid-bg cursor-crosshair overflow-hidden touch-none"
       >
         <canvas
           ref={canvasRef}
@@ -315,75 +438,87 @@ export function DrawingCanvas({
           onTouchStart={startDrawing}
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
-          className="w-full h-full block"
+          className="absolute inset-0 w-full h-full block"
+          aria-label="Drawing canvas"
         />
 
-        {/* Empty state hint */}
-        {!hasDrawn && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-            <span className="text-zinc-400/60 text-sm font-medium tracking-wide">
-              Draw an object here (e.g. coffee mug, chair, sword)...
-            </span>
+        {isDraggingOver && (
+          <div className="absolute inset-3 rounded-xl bg-brand-600/15 backdrop-blur-sm border-2 border-dashed border-brand-400 flex flex-col items-center justify-center text-brand-700 gap-1 z-20">
+            <span className="font-semibold text-sm">Drop image to load</span>
+          </div>
+        )}
+
+        {!hasDrawn && !isDraggingOver && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none p-6 text-center gap-1.5">
+            <p className="text-sm font-semibold text-zinc-500">Draw something here</p>
+            <p className="text-xs text-zinc-400">or pick a preset above · drag in an image</p>
           </div>
         )}
       </div>
 
-      {/* Bottom Controls & Action Bar */}
-      <div className="p-3 bg-zinc-900/80 border-t border-zinc-800 flex flex-col gap-2.5">
-        <div className="flex items-center gap-3">
-          {/* Prompt Input */}
-          <div className="flex-1 relative">
-            <input
-              type="text"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Optional description (e.g., 'a ceramic teacup')"
-              disabled={isLoading}
-              className="w-full bg-zinc-950/80 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-indigo-500 transition-colors disabled:opacity-50"
-            />
-          </div>
+      {/* Prompt dock */}
+      <div className="p-3 border-t border-white/[0.06] flex flex-col gap-2.5">
+        <div className="flex items-center gap-1.5 overflow-x-auto">
+          {STYLE_CHIPS.map((chip) => {
+            const on = prompt.toLowerCase().includes(chip);
+            return (
+              <button
+                key={chip}
+                type="button"
+                onClick={() => addStyleTag(chip)}
+                disabled={isLoading || on}
+                className={`h-6 px-2 rounded-md text-[11px] shrink-0 border transition-colors ${
+                  on
+                    ? "bg-brand-500/15 text-brand-200 border-brand-400/30"
+                    : "text-zinc-400 border-white/[0.06] hover:text-white hover:border-white/20"
+                }`}
+              >
+                {on ? "✓" : "+"} {chip}
+              </button>
+            );
+          })}
+        </div>
 
-          {/* Background Removal Checkbox */}
-          <label className="flex items-center gap-1.5 text-xs text-zinc-400 cursor-pointer select-none">
+        <div className="flex items-stretch gap-2">
+          <input
+            type="text"
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            placeholder="Describe it (optional) — e.g. a ceramic mug, low poly"
+            disabled={isLoading}
+            aria-label="Prompt"
+            className="flex-1 min-w-0 h-11 bg-black/30 border border-white/[0.08] rounded-xl px-3.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-brand-400/60 focus:ring-2 focus:ring-brand-500/20 transition disabled:opacity-50"
+          />
+          <label
+            className="shrink-0 h-11 px-3 inline-flex items-center gap-2 rounded-xl border border-white/[0.08] text-xs text-zinc-300 cursor-pointer select-none hover:bg-white/[0.03]"
+            title="Automatically remove the background before 3D reconstruction"
+          >
             <input
               type="checkbox"
               checked={removeBackground}
               onChange={(e) => setRemoveBackground(e.target.checked)}
               disabled={isLoading}
-              className="rounded border-zinc-700 bg-zinc-800 text-indigo-600 focus:ring-0 focus:ring-offset-0"
+              className="accent-brand-500"
             />
-            <span>Auto-RMBG</span>
+            Remove BG
           </label>
         </div>
 
-        {/* Generate 3D Button */}
         <button
           type="button"
           onClick={handleGenerate}
           disabled={isLoading || !hasDrawn}
-          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 active:scale-[0.99] text-white font-medium text-xs sm:text-sm shadow-lg shadow-indigo-600/25 flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:pointer-events-none"
+          className="btn-primary w-full !h-12 !rounded-xl disabled:opacity-40 disabled:pointer-events-none disabled:shadow-none"
         >
           {isLoading ? (
             <>
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-              <span>Generating 3D Model...</span>
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Generating…
             </>
           ) : (
             <>
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-                />
-              </svg>
-              <span>Generate 3D</span>
+              Generate 3D model
+              <kbd className="hidden sm:inline-flex items-center h-5 px-1.5 rounded bg-white/15 text-[10px] font-mono">Ctrl ↵</kbd>
             </>
           )}
         </button>

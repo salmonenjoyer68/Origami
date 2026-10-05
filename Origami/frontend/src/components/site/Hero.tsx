@@ -16,9 +16,9 @@ export function Hero() {
         <div className="text-center lg:text-left">
           <a
             href="#how"
-            className="reveal inline-flex items-center gap-2 h-8 pl-1 pr-3 rounded-full border border-white/10 bg-white/[0.03] text-xs text-zinc-300 hover:border-brand-400/40 transition-colors"
+            className="reveal inline-flex items-center gap-2 h-8 pl-1 pr-3 rounded-full border border-line bg-surface text-xs text-fg hover:border-line-strong transition-colors"
           >
-            <span className="px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-200 font-semibold">New</span>
+            <span className="px-2 py-0.5 rounded-full bg-fg text-canvas font-semibold">New</span>
             Gemini + TripoSG pipeline
             <span aria-hidden="true">→</span>
           </a>
@@ -30,7 +30,7 @@ export function Hero() {
           </h1>
 
           <p
-            className="reveal mt-6 text-base sm:text-lg text-zinc-400 max-w-xl mx-auto lg:mx-0 leading-relaxed"
+            className="reveal mt-6 text-base sm:text-lg text-fg-muted max-w-xl mx-auto lg:mx-0 leading-relaxed"
             style={{ transitionDelay: "160ms" }}
           >
             Origami turns a rough doodle into an interactive, downloadable 3D model. No modeling skills needed. Draw,
@@ -61,9 +61,9 @@ export function Hero() {
               [".GLB", "ready export"],
               ["6", "starter presets"],
             ].map(([v, l]) => (
-              <div key={l} className="border-l border-white/10 pl-4">
-                <dt className="font-display text-2xl font-semibold text-white">{v}</dt>
-                <dd className="text-xs text-zinc-500 mt-1">{l}</dd>
+              <div key={l} className="border-l border-line pl-4">
+                <dt className="font-display text-2xl font-semibold text-fg">{v}</dt>
+                <dd className="text-xs text-fg-faint mt-1">{l}</dd>
               </div>
             ))}
           </dl>
@@ -71,13 +71,13 @@ export function Hero() {
 
         {/* Visual: doodle → folded 3D */}
         <div className="reveal relative" style={{ transitionDelay: "200ms" }} aria-hidden="true">
-          <div className="absolute -inset-10 bg-brand-500/20 blur-3xl rounded-full" />
+          <div className="absolute -inset-10 bg-fg/5 blur-3xl rounded-full" />
           <div className="relative card p-6 sm:p-8">
             <div className="flex items-center gap-1.5 mb-6">
-              <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-              <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-              <span className="w-2.5 h-2.5 rounded-full bg-white/15" />
-              <span className="ml-3 text-[11px] text-zinc-500 font-mono">swan.png → swan.glb</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-line-strong" />
+              <span className="w-2.5 h-2.5 rounded-full bg-line-strong" />
+              <span className="w-2.5 h-2.5 rounded-full bg-line-strong" />
+              <span className="ml-3 text-[11px] text-fg-faint font-mono">swan.png → swan.glb</span>
             </div>
 
             <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
@@ -87,7 +87,7 @@ export function Hero() {
                   <path
                     d="M30 130 L80 135 L160 120 L130 85 L70 85 Z M70 85 L45 35 L25 42 L55 95 M80 135 L100 40 L130 85 M100 40 L150 65"
                     fill="none"
-                    stroke="#4f46e5"
+                    stroke="#18181b"
                     strokeWidth="5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -97,25 +97,25 @@ export function Hero() {
                 </svg>
               </div>
 
-              <div className="flex flex-col items-center gap-1 text-brand-300">
+              <div className="flex flex-col items-center gap-1 text-fg">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5-5 5M6 12h12" />
                 </svg>
-                <span className="text-[10px] font-mono text-zinc-500">AI</span>
+                <span className="text-[10px] font-mono text-fg-faint">AI</span>
               </div>
 
               {/* 3D result */}
-              <div className="aspect-square rounded-xl bg-gradient-to-b from-studio-800 to-studio-950 border border-white/[0.06] flex items-center justify-center relative overflow-hidden">
-                <div className="absolute bottom-3 w-2/3 h-3 rounded-full bg-black/60 blur-md" />
-                <Logo className="w-3/5 h-3/5 animate-float drop-shadow-[0_10px_30px_rgba(99,102,241,0.5)]" />
+              <div className="aspect-square rounded-xl bg-surface-2 border border-line flex items-center justify-center relative overflow-hidden">
+                <div className="absolute bottom-3 w-2/3 h-3 rounded-full bg-black/30 blur-md" />
+                <Logo className="w-3/5 h-3/5 animate-float text-fg drop-shadow-[0_10px_30px_rgba(0,0,0,0.35)]" />
               </div>
             </div>
 
             <div className="mt-6 flex items-center justify-between text-xs">
-              <span className="inline-flex items-center gap-2 text-emerald-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Mesh ready
+              <span className="inline-flex items-center gap-2 text-fg">
+                <span className="w-1.5 h-1.5 rounded-full bg-fg" /> Mesh ready
               </span>
-              <span className="text-zinc-500 font-mono">100k faces · 28.4s</span>
+              <span className="text-fg-faint font-mono">100k faces · 28.4s</span>
             </div>
           </div>
         </div>

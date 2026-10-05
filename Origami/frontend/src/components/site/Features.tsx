@@ -49,7 +49,7 @@ export function Features() {
       <div className="max-w-2xl">
         <span className="reveal eyebrow">Features</span>
         <h2 className="reveal heading-lg text-gradient mt-4">Everything you need, nothing you don&apos;t</h2>
-        <p className="reveal mt-4 text-zinc-400 leading-relaxed">
+        <p className="reveal mt-4 text-fg-muted leading-relaxed">
           A focused toolset for going from idea to usable 3D asset, without learning a modeling package.
         </p>
       </div>
@@ -58,16 +58,16 @@ export function Features() {
         {FEATURES.map((f, i) => (
           <article
             key={f.title}
-            className={`reveal card p-6 group hover:-translate-y-0.5 hover:border-brand-400/30 transition-all duration-300 ${f.span}`}
+            className={`reveal card p-6 group hover:-translate-y-0.5 hover:border-line-strong transition-all duration-300 ${f.span}`}
             style={{ transitionDelay: `${(i % 3) * 80}ms` }}
           >
-            <div className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-zinc-300 group-hover:text-brand-300 group-hover:border-brand-400/30 transition-colors">
+            <div className="w-10 h-10 rounded-lg bg-surface-2 border border-line flex items-center justify-center text-fg-muted group-hover:text-fg group-hover:border-line-strong transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d={f.icon} />
               </svg>
             </div>
-            <h3 className="mt-5 font-semibold text-white">{f.title}</h3>
-            <p className="mt-1.5 text-sm text-zinc-400 leading-relaxed">{f.body}</p>
+            <h3 className="mt-5 font-semibold text-fg">{f.title}</h3>
+            <p className="mt-1.5 text-sm text-fg-muted leading-relaxed">{f.body}</p>
           </article>
         ))}
       </div>

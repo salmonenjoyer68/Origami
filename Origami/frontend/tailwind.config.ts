@@ -9,35 +9,27 @@ const config: Config = {
         display: ["var(--font-display)", "var(--font-inter)", "system-ui", "sans-serif"],
       },
       colors: {
-        studio: {
-          950: "#070709",
-          900: "#0e0e12",
-          850: "#131318",
-          800: "#1a1a22",
-          700: "#272732",
-          600: "#383847",
+        /* Semantic monochrome tokens (defined in globals.css) */
+        canvas: "rgb(var(--bg) / <alpha-value>)",
+        surface: {
+          DEFAULT: "rgb(var(--surface) / <alpha-value>)",
+          2: "rgb(var(--surface-2) / <alpha-value>)",
         },
-        brand: {
-          50: "#eef2ff",
-          100: "#e0e7ff",
-          200: "#c7d2fe",
-          300: "#a5b4fc",
-          400: "#818cf8",
-          500: "#6366f1",
-          600: "#4f46e5",
-          700: "#4338ca",
-          800: "#3730a3",
-          900: "#312e81",
+        line: {
+          DEFAULT: "rgb(var(--line) / <alpha-value>)",
+          strong: "rgb(var(--line-strong) / <alpha-value>)",
+        },
+        fg: {
+          DEFAULT: "rgb(var(--fg) / <alpha-value>)",
+          muted: "rgb(var(--fg-muted) / <alpha-value>)",
+          faint: "rgb(var(--fg-faint) / <alpha-value>)",
         },
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "studio-mesh":
-          "radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%), radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.1) 0px, transparent 50%), radial-gradient(at 50% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%)",
       },
       boxShadow: {
-        glow: "0 0 0 1px rgba(129,140,248,0.25), 0 8px 40px -8px rgba(99,102,241,0.45)",
-        card: "0 1px 0 0 rgba(255,255,255,0.04) inset, 0 20px 50px -20px rgba(0,0,0,0.7)",
+        card: "0 1px 0 0 rgb(var(--fg) / 0.03)",
       },
       animation: {
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",

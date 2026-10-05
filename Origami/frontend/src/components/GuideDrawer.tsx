@@ -31,17 +31,17 @@ export function GuideDrawer({ isOpen, onClose }: GuideDrawerProps) {
       />
 
       {/* Drawer */}
-      <div className="relative w-full max-w-md bg-studio-900 border-l border-white/10 shadow-2xl h-full flex flex-col overflow-hidden animate-slide-left">
+      <div className="relative w-full max-w-md bg-surface border-l border-line shadow-2xl h-full flex flex-col overflow-hidden animate-slide-left">
         {/* Header */}
-        <div className="px-6 h-16 border-b border-white/[0.08] flex items-center justify-between">
+        <div className="px-6 h-16 border-b border-line flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <span className="text-xl">📖</span>
-            <h2 className="font-display font-semibold text-lg text-white">Origami Studio Guide</h2>
+            <h2 className="font-display font-semibold text-lg text-fg">Origami Studio Guide</h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="icon-btn !h-8 !w-8 hover:!bg-white/10"
+            className="icon-btn !h-8 !w-8"
             aria-label="Close guide"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,32 +54,32 @@ export function GuideDrawer({ isOpen, onClose }: GuideDrawerProps) {
         <div className="flex-1 overflow-y-auto p-6 space-y-8 text-sm">
           {/* Quick Start */}
           <section className="space-y-3">
-            <h3 className="font-semibold text-white uppercase tracking-wider text-xs text-brand-300">
+            <h3 className="font-semibold text-fg-muted uppercase tracking-wider text-xs">
               Quick Start
             </h3>
-            <ol className="space-y-3 text-zinc-300">
+            <ol className="space-y-3 text-fg-muted">
               <li className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-brand-500/20 text-brand-300 font-mono text-xs flex items-center justify-center shrink-0 border border-brand-500/30">
+                <span className="w-6 h-6 rounded-full bg-surface-2 text-fg font-mono text-xs flex items-center justify-center shrink-0 border border-line">
                   1
                 </span>
                 <div>
-                  <strong className="text-white">Sketch or drop an image:</strong> Draw in the left pane using the pen, shading, or preset doodles.
+                  <strong className="text-fg">Sketch or drop an image:</strong> Draw in the left pane using the pen, shading, or preset doodles.
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-brand-500/20 text-brand-300 font-mono text-xs flex items-center justify-center shrink-0 border border-brand-500/30">
+                <span className="w-6 h-6 rounded-full bg-surface-2 text-fg font-mono text-xs flex items-center justify-center shrink-0 border border-line">
                   2
                 </span>
                 <div>
-                  <strong className="text-white">Add a prompt:</strong> Type what you drew (e.g. <em>&quot;ceramic coffee mug&quot;</em>) and select style tags like <em>low poly</em>.
+                  <strong className="text-fg">Add a prompt:</strong> Type what you drew (e.g. <em>&quot;ceramic coffee mug&quot;</em>) and select style tags like <em>low poly</em>.
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-brand-500/20 text-brand-300 font-mono text-xs flex items-center justify-center shrink-0 border border-brand-500/30">
+                <span className="w-6 h-6 rounded-full bg-surface-2 text-fg font-mono text-xs flex items-center justify-center shrink-0 border border-line">
                   3
                 </span>
                 <div>
-                  <strong className="text-white">Generate &amp; Orbit:</strong> Click <strong>Generate 3D</strong> (or press <kbd className="px-1.5 py-0.5 rounded bg-white/10 font-mono text-xs">Ctrl+Enter</kbd>). Interact with your mesh, toggle wireframe, and download the <code className="text-brand-300 font-mono">.GLB</code> file.
+                  <strong className="text-fg">Generate &amp; Orbit:</strong> Click <strong>Generate 3D</strong> (or press <kbd className="px-1.5 py-0.5 rounded bg-surface-2 border border-line font-mono text-xs">Ctrl+Enter</kbd>). Interact with your mesh, toggle wireframe, and download the <code className="text-fg font-mono">.GLB</code> file.
                 </div>
               </li>
             </ol>
@@ -87,35 +87,35 @@ export function GuideDrawer({ isOpen, onClose }: GuideDrawerProps) {
 
           {/* Keyboard Shortcuts */}
           <section className="space-y-3">
-            <h3 className="font-semibold text-white uppercase tracking-wider text-xs text-brand-300">
+            <h3 className="font-semibold text-fg-muted uppercase tracking-wider text-xs">
               Shortcuts
             </h3>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2.5 rounded-lg bg-black/30 border border-white/[0.06] flex items-center justify-between">
-                <span className="text-zinc-400">Generate 3D</span>
-                <kbd className="px-2 py-0.5 rounded bg-white/10 font-mono text-zinc-200">Ctrl + ↵</kbd>
+              <div className="p-2.5 rounded-lg bg-canvas border border-line flex items-center justify-between">
+                <span className="text-fg-muted">Generate 3D</span>
+                <kbd className="px-2 py-0.5 rounded bg-surface-2 border border-line font-mono text-fg">Ctrl + ↵</kbd>
               </div>
-              <div className="p-2.5 rounded-lg bg-black/30 border border-white/[0.06] flex items-center justify-between">
-                <span className="text-zinc-400">Undo Stroke</span>
-                <kbd className="px-2 py-0.5 rounded bg-white/10 font-mono text-zinc-200">Ctrl + Z</kbd>
+              <div className="p-2.5 rounded-lg bg-canvas border border-line flex items-center justify-between">
+                <span className="text-fg-muted">Undo Stroke</span>
+                <kbd className="px-2 py-0.5 rounded bg-surface-2 border border-line font-mono text-fg">Ctrl + Z</kbd>
               </div>
-              <div className="p-2.5 rounded-lg bg-black/30 border border-white/[0.06] flex items-center justify-between">
-                <span className="text-zinc-400">Orbit 3D</span>
-                <span className="text-zinc-300">Left Drag</span>
+              <div className="p-2.5 rounded-lg bg-canvas border border-line flex items-center justify-between">
+                <span className="text-fg-muted">Orbit 3D</span>
+                <span className="text-fg">Left Drag</span>
               </div>
-              <div className="p-2.5 rounded-lg bg-black/30 border border-white/[0.06] flex items-center justify-between">
-                <span className="text-zinc-400">Zoom / Pan</span>
-                <span className="text-zinc-300">Scroll / Right Drag</span>
+              <div className="p-2.5 rounded-lg bg-canvas border border-line flex items-center justify-between">
+                <span className="text-fg-muted">Zoom / Pan</span>
+                <span className="text-fg">Scroll / Right Drag</span>
               </div>
             </div>
           </section>
 
           {/* Sketching Tips */}
           <section className="space-y-3">
-            <h3 className="font-semibold text-white uppercase tracking-wider text-xs text-brand-300">
+            <h3 className="font-semibold text-fg-muted uppercase tracking-wider text-xs">
               Tips for Best 3D Results
             </h3>
-            <ul className="space-y-2 text-zinc-300 list-disc list-inside">
+            <ul className="space-y-2 text-fg-muted list-disc list-inside">
               <li>Draw clear, closed outlines with good contrast.</li>
               <li>Focus on a single central object rather than a full landscape.</li>
               <li>Use the <strong>Remove BG</strong> option if your uploaded photo has a messy background.</li>
@@ -125,24 +125,24 @@ export function GuideDrawer({ isOpen, onClose }: GuideDrawerProps) {
 
           {/* FAQ */}
           <section className="space-y-3">
-            <h3 className="font-semibold text-white uppercase tracking-wider text-xs text-brand-300">
+            <h3 className="font-semibold text-fg-muted uppercase tracking-wider text-xs">
               Frequently Asked Questions
             </h3>
             <div className="space-y-3">
-              <div className="p-3 rounded-xl bg-black/20 border border-white/[0.06]">
-                <p className="font-medium text-white mb-1">What file format do I get?</p>
-                <p className="text-zinc-400 text-xs">Standard binary <code className="text-brand-300 font-mono">.GLB</code> meshes compatible with Blender, Unreal Engine, Unity, Godot, and Three.js.</p>
+              <div className="p-3 rounded-xl bg-canvas border border-line">
+                <p className="font-medium text-fg mb-1">What file format do I get?</p>
+                <p className="text-fg-muted text-xs">Standard binary <code className="text-fg font-mono">.GLB</code> meshes compatible with Blender, Unreal Engine, Unity, Godot, and Three.js.</p>
               </div>
-              <div className="p-3 rounded-xl bg-black/20 border border-white/[0.06]">
-                <p className="font-medium text-white mb-1">Why am I seeing a demo model?</p>
-                <p className="text-zinc-400 text-xs">The free Hugging Face ZeroGPU queue occasionally hits its rate limit. Origami serves a high-fidelity sample crane mesh so your workflow never breaks while the quota resets.</p>
+              <div className="p-3 rounded-xl bg-canvas border border-line">
+                <p className="font-medium text-fg mb-1">Why am I seeing a demo model?</p>
+                <p className="text-fg-muted text-xs">The free Hugging Face ZeroGPU queue occasionally hits its rate limit. Origami serves a high-fidelity sample crane mesh so your workflow never breaks while the quota resets.</p>
               </div>
             </div>
           </section>
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-white/[0.08] bg-studio-950 flex items-center justify-between text-xs text-zinc-500">
+        <div className="p-4 border-t border-line bg-canvas flex items-center justify-between text-xs text-fg-faint">
           <span>Origami Studio 2.0</span>
           <button type="button" onClick={onClose} className="btn-secondary !h-8 !px-3 !text-xs">
             Got it

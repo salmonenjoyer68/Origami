@@ -37,8 +37,8 @@ function Banner({
 }) {
   const styles =
     tone === "error"
-      ? "border-rose-500/30 bg-rose-500/[0.08] text-rose-100"
-      : "border-amber-400/30 bg-amber-400/[0.08] text-amber-100";
+      ? "border-fg bg-canvas text-fg"
+      : "border-line-strong bg-surface-2 text-fg";
   return (
     <div role={tone === "error" ? "alert" : "status"} className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm animate-fade-in ${styles}`}>
       <div className="flex-1 min-w-0">
@@ -62,7 +62,7 @@ export function StudioSection(p: StudioSectionProps) {
       <div className="text-center max-w-2xl mx-auto px-2">
         <span className="reveal eyebrow">The studio</span>
         <h2 className="reveal heading-lg text-gradient mt-4">Draw on the left. Get 3D on the right.</h2>
-        <p className="reveal mt-4 text-zinc-400">This is the real tool, not a demo video. Give it a try.</p>
+        <p className="reveal mt-4 text-fg-muted">This is the real tool, not a demo video. Give it a try.</p>
       </div>
 
       {(p.error || p.isPreview) && (
@@ -83,17 +83,17 @@ export function StudioSection(p: StudioSectionProps) {
 
       {/* App window frame */}
       <div className="reveal relative mt-10">
-        <div className="absolute -inset-x-10 -inset-y-6 bg-brand-500/10 blur-3xl rounded-[40px] pointer-events-none" aria-hidden="true" />
-        <div className="relative rounded-2xl border border-white/[0.08] bg-studio-900 shadow-[0_40px_120px_-30px_rgba(0,0,0,0.9)] overflow-hidden">
-          <div className="h-10 px-4 flex items-center gap-2 border-b border-white/[0.06] bg-studio-850">
-            <span className="w-3 h-3 rounded-full bg-[#ff5f57]/80" />
-            <span className="w-3 h-3 rounded-full bg-[#febc2e]/80" />
-            <span className="w-3 h-3 rounded-full bg-[#28c840]/80" />
-            <span className="flex-1 text-center text-xs text-zinc-500 font-medium -ml-12">Origami Studio</span>
+        <div className="absolute -inset-x-10 -inset-y-6 bg-fg/5 blur-3xl rounded-[40px] pointer-events-none" aria-hidden="true" />
+        <div className="relative rounded-2xl border border-line bg-surface shadow-[0_40px_120px_-30px_rgba(0,0,0,0.5)] overflow-hidden">
+          <div className="h-10 px-4 flex items-center gap-2 border-b border-line bg-surface-2">
+            <span className="w-3 h-3 rounded-full bg-line-strong" />
+            <span className="w-3 h-3 rounded-full bg-line-strong" />
+            <span className="w-3 h-3 rounded-full bg-line-strong" />
+            <span className="flex-1 text-center text-xs text-fg-faint font-medium -ml-12">Origami Studio</span>
           </div>
 
-          <div className="grid lg:grid-cols-2 lg:divide-x divide-white/[0.06]">
-            <div className="h-[640px] lg:h-[700px] border-b lg:border-b-0 border-white/[0.06]">
+          <div className="grid lg:grid-cols-2 lg:divide-x divide-line">
+            <div className="h-[640px] lg:h-[700px] border-b lg:border-b-0 border-line">
               <DrawingCanvas
                 onGenerate={p.onGenerate}
                 isLoading={p.isLoading}

@@ -2,8 +2,35 @@
 @tailwind components;
 @tailwind utilities;
 
+/* -------------------------------------------------------------------------
+   Monochrome design tokens.
+   Stored as RGB triplets so Tailwind opacity modifiers (bg-fg/40, …) work.
+   Light is the default; dark values swap in via prefers-color-scheme.
+   ------------------------------------------------------------------------- */
 :root {
-  color-scheme: dark;
+  color-scheme: light dark;
+
+  --bg: 255 255 255;
+  --surface: 250 250 250;
+  --surface-2: 244 244 245;
+  --line: 228 228 231;
+  --line-strong: 212 212 216;
+  --fg: 9 9 11;
+  --fg-muted: 63 63 70;
+  --fg-faint: 113 113 122;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: 0 0 0;
+    --surface: 12 12 14;
+    --surface-2: 24 24 27;
+    --line: 39 39 42;
+    --line-strong: 63 63 70;
+    --fg: 244 244 245;
+    --fg-muted: 161 161 170;
+    --fg-faint: 113 113 122;
+  }
 }
 
 html {
@@ -14,36 +41,36 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background-color: #070709;
-  color: #f4f4f5;
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
 /* Visible, consistent keyboard focus */
 :focus-visible {
-  outline: 2px solid #818cf8;
+  outline: 2px solid rgb(var(--fg));
   outline-offset: 2px;
   border-radius: 6px;
 }
 
-/* Custom Sleek Scrollbar */
+/* Minimal scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #070709;
+  background: rgb(var(--bg));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3);
+  background: rgb(var(--line-strong));
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.6);
+  background: rgb(var(--fg-faint));
 }
 
 @layer components {
@@ -52,7 +79,7 @@ body {
   }
 
   .eyebrow {
-    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand-300;
+    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-fg-muted;
   }
 
   .heading-xl {
@@ -63,65 +90,68 @@ body {
     @apply font-display font-semibold tracking-tight text-3xl sm:text-4xl lg:text-5xl leading-[1.1];
   }
 
+  /* Monochrome headline gradient (fg -> muted), same for both accents */
   .text-gradient {
-    @apply bg-gradient-to-br from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-fg to-fg-muted bg-clip-text text-transparent;
   }
 
   .text-gradient-brand {
-    @apply bg-gradient-to-r from-brand-300 via-violet-300 to-sky-300 bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-fg to-fg-muted bg-clip-text text-transparent;
   }
 
+  /* Primary: inverted solid — black on light, white on dark */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full text-sm font-semibold text-white
-      bg-gradient-to-b from-brand-500 to-brand-600 shadow-glow
-      hover:from-brand-400 hover:to-brand-500 active:scale-[0.98] transition-all;
+    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full text-sm font-semibold text-canvas
+      bg-fg hover:opacity-90 active:scale-[0.98] transition-all;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full text-sm font-medium text-zinc-200
-      bg-white/[0.04] border border-white/10 hover:bg-white/[0.08] hover:text-white active:scale-[0.98] transition-all;
+    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full text-sm font-medium text-fg
+      bg-surface border border-line hover:bg-surface-2 active:scale-[0.98] transition-all;
   }
 
   .card {
-    @apply rounded-2xl border border-white/[0.07] bg-gradient-to-b from-white/[0.04] to-white/[0.01] shadow-card;
+    @apply rounded-2xl border border-line bg-surface;
   }
 
   .icon-btn {
-    @apply inline-flex items-center justify-center h-8 min-w-8 px-2 rounded-lg text-zinc-400
-      hover:text-white hover:bg-white/[0.06] disabled:opacity-30 disabled:pointer-events-none transition-colors;
+    @apply inline-flex items-center justify-center h-8 min-w-8 px-2 rounded-lg text-fg-muted
+      hover:text-fg hover:bg-surface-2 disabled:opacity-30 disabled:pointer-events-none transition-colors;
   }
 
   .segmented {
-    @apply inline-flex items-center gap-0.5 p-0.5 rounded-lg bg-black/30 border border-white/[0.06];
+    @apply inline-flex items-center gap-0.5 p-0.5 rounded-lg bg-surface-2 border border-line;
   }
 
   .segmented > button {
-    @apply h-7 px-2.5 rounded-md text-xs font-medium text-zinc-400 hover:text-zinc-100 transition-colors;
+    @apply h-7 px-2.5 rounded-md text-xs font-medium text-fg-muted hover:text-fg transition-colors;
   }
 
+  /* Active segment: inverted contrast instead of color */
   .segmented > button[data-active="true"] {
-    @apply bg-white/[0.1] text-white shadow-sm;
+    @apply bg-fg text-canvas shadow-sm;
   }
 }
 
-/* Glassmorphic Panel utility */
+/* Flat panel utility (was glassmorphic — now a plain bordered surface) */
 .glass-panel {
-  background: rgba(19, 19, 24, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgb(var(--surface));
+  border: 1px solid rgb(var(--line));
 }
 
-/* Page background: hero glow + faint dot grid */
+/* Page background: plain monochrome base */
 .page-bg {
-  background:
-    radial-gradient(60% 50% at 50% 0%, rgba(99, 102, 241, 0.18) 0%, transparent 70%),
-    radial-gradient(40% 30% at 85% 20%, rgba(168, 85, 247, 0.10) 0%, transparent 70%),
-    #070709;
+  background: rgb(var(--bg));
 }
 
+/* 3D viewport backdrop: soft neutral vignette */
+.viewport-bg {
+  background: radial-gradient(ellipse at center, rgb(var(--surface-2)) 0%, rgb(var(--bg)) 70%);
+}
+
+/* Faint dot grid, tinted with the current foreground color */
 .dot-grid {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgb(var(--fg) / 0.06) 1px, transparent 1px);
   background-size: 22px 22px;
   mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
   -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);

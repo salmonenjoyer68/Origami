@@ -12,7 +12,7 @@ import {
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 
-export type LightingMode = "studio" | "neon" | "warm" | "clay";
+export type LightingMode = "studio" | "contrast" | "rim" | "clay";
 
 export interface ModelViewerProps {
   modelUrl: string | null;
@@ -46,7 +46,7 @@ function Model({ url, wireframe, lightingMode }: ModelProps) {
       }
       if (lightingMode === "clay") {
         return new THREE.MeshStandardMaterial({
-          color: "#e2e8f0",
+          color: "#a1a1aa",
           roughness: 0.6,
           metalness: 0.1,
           wireframe,
@@ -71,25 +71,25 @@ function Model({ url, wireframe, lightingMode }: ModelProps) {
   return <primitive object={clonedScene} />;
 }
 
-// Lighting Rig Component based on selected mode
+// Lighting Rig Component based on selected mode (monochrome: all-white key/fill/rim)
 function StudioLighting({ mode }: { mode: LightingMode }) {
-  if (mode === "neon") {
+  if (mode === "contrast") {
     return (
       <>
-        <ambientLight intensity={0.4} color="#1e1b4b" />
-        <directionalLight position={[6, 8, 4]} intensity={2.2} color="#a855f7" />
-        <directionalLight position={[-6, 4, -4]} intensity={2.5} color="#06b6d4" />
-        <pointLight position={[0, -2, 0]} intensity={1.0} color="#ec4899" />
+        <ambientLight intensity={0.15} color="#ffffff" />
+        <directionalLight position={[6, 8, 4]} intensity={3.0} color="#ffffff" />
+        <directionalLight position={[-6, 4, -4]} intensity={0.5} color="#ffffff" />
+        <pointLight position={[0, -2, 0]} intensity={0.6} color="#ffffff" />
       </>
     );
   }
 
-  if (mode === "warm") {
+  if (mode === "rim") {
     return (
       <>
-        <ambientLight intensity={0.8} color="#fffbeb" />
-        <directionalLight position={[8, 12, 6]} intensity={2.0} color="#f59e0b" />
-        <directionalLight position={[-6, 6, -6]} intensity={0.9} color="#ea580c" />
+        <ambientLight intensity={0.35} color="#ffffff" />
+        <directionalLight position={[8, 12, -6]} intensity={2.6} color="#ffffff" />
+        <directionalLight position={[-6, 6, 6]} intensity={0.5} color="#ffffff" />
       </>
     );
   }
@@ -166,7 +166,7 @@ function PlaceholderMesh() {
       <mesh position={[0, 0.1, 0]}>
         <octahedronGeometry args={[1.3, 0]} />
         <meshStandardMaterial
-          color="#818cf8"
+          color="#71717a"
           wireframe
           transparent
           opacity={0.65}
@@ -185,7 +185,7 @@ function LoaderIndicator() {
       <mesh position={[0, 0.1, 0]}>
         <icosahedronGeometry args={[1.1, 1]} />
         <meshStandardMaterial
-          color="#38bdf8"
+          color="#71717a"
           wireframe
           transparent
           opacity={0.85}
@@ -236,7 +236,7 @@ export default function ModelViewer({
         </Suspense>
 
         <gridHelper
-          args={[10, 20, "#4f46e5", "#1e1b4b"]}
+          args={[10, 20, "#a1a1aa", "#71717a"]}
           position={[0, -0.9, 0]}
         />
         <ContactShadows
@@ -245,7 +245,7 @@ export default function ModelViewer({
           scale={8}
           blur={2.5}
           far={3}
-          color="#030712"
+          color="#000000"
         />
 
         <OrbitControls

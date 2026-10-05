@@ -26,15 +26,19 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#070709",
+  colorScheme: "light dark",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable} ${display.variable}`}>
-      <body className="font-sans bg-studio-950 text-zinc-100 antialiased selection:bg-brand-500 selection:text-white">
+    <html lang="en" className={`${inter.variable} ${display.variable}`}>
+      <body className="font-sans bg-canvas text-fg antialiased selection:bg-fg selection:text-canvas">
         {children}
       </body>
     </html>

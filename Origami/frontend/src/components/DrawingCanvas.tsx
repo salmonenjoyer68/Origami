@@ -296,9 +296,9 @@ export function DrawingCanvas({
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-studio-900 overflow-hidden relative">
+    <div className="w-full h-full flex flex-col bg-surface overflow-hidden relative">
       {/* Sleek Top Studio Toolbar */}
-      <div className="px-3.5 h-12 border-b border-white/[0.08] flex items-center justify-between gap-3 bg-studio-900/90 backdrop-blur shrink-0 z-10">
+      <div className="px-3.5 h-12 border-b border-line flex items-center justify-between gap-3 bg-surface/90 backdrop-blur shrink-0 z-10">
         {/* Left: Tools */}
         <div className="flex items-center gap-2">
           <div className="segmented" role="radiogroup" aria-label="Drawing tool">
@@ -321,7 +321,7 @@ export function DrawingCanvas({
             ))}
           </div>
 
-          <div className="w-px h-5 bg-white/10 mx-1 hidden sm:block" />
+          <div className="w-px h-5 bg-line mx-1 hidden sm:block" />
 
           {/* Color swatches */}
           <div className={`hidden sm:flex items-center gap-1.5 transition-opacity ${tool === "eraser" ? "opacity-25 pointer-events-none" : ""}`}>
@@ -335,30 +335,30 @@ export function DrawingCanvas({
                 onClick={() => setColor(p.value)}
                 style={{ backgroundColor: p.value }}
                 className={`w-4 h-4 rounded-full transition-all ${
-                  color === p.value ? "ring-2 ring-offset-1 ring-offset-studio-900 ring-white" : "hover:scale-110 opacity-80 hover:opacity-100"
+                  color === p.value ? "ring-2 ring-offset-1 ring-offset-surface ring-fg" : "hover:scale-110 opacity-80 hover:opacity-100"
                 }`}
               />
             ))}
-            <label className="relative w-4 h-4 rounded-full overflow-hidden ring-1 ring-white/20 cursor-pointer bg-[conic-gradient(red,yellow,lime,cyan,blue,magenta,red)] hover:scale-110 transition-transform" title="Custom color">
+            <label className="relative w-4 h-4 rounded-full overflow-hidden ring-1 ring-line-strong cursor-pointer bg-[conic-gradient(red,yellow,lime,cyan,blue,magenta,red)] hover:scale-110 transition-transform" title="Custom color">
               <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="absolute inset-0 opacity-0 cursor-pointer" aria-label="Custom color" />
             </label>
           </div>
 
-          <div className="w-px h-5 bg-white/10 mx-1 hidden md:block" />
+          <div className="w-px h-5 bg-line mx-1 hidden md:block" />
 
           {/* Brush Size */}
-          <div className="hidden md:flex items-center gap-2 text-xs text-zinc-400">
+          <div className="hidden md:flex items-center gap-2 text-xs text-fg-muted">
             <input
               type="range"
               min={2}
               max={28}
               value={brushSize}
               onChange={(e) => setBrushSize(Number(e.target.value))}
-              className="w-16 accent-brand-500 cursor-pointer"
+              className="w-16 accent-fg cursor-pointer"
               aria-label="Brush size"
               title={`Brush size: ${brushSize}px`}
             />
-            <span className="font-mono text-[11px] text-zinc-400">{brushSize}px</span>
+            <span className="font-mono text-[11px] text-fg-muted">{brushSize}px</span>
           </div>
         </div>
 
@@ -366,7 +366,7 @@ export function DrawingCanvas({
         <div className="flex items-center gap-1.5">
           <button
             type="button"
-            className="icon-btn !h-8 !px-2.5 gap-1.5 text-xs text-zinc-300 hover:text-white"
+            className="icon-btn !h-8 !px-2.5 gap-1.5 text-xs"
             onClick={handleUndo}
             disabled={history.length <= 1 || isLoading}
             title="Undo stroke (Ctrl+Z)"
@@ -379,7 +379,7 @@ export function DrawingCanvas({
 
           <button
             type="button"
-            className="icon-btn !h-8 !px-2.5 gap-1.5 text-xs text-zinc-300 hover:text-white"
+            className="icon-btn !h-8 !px-2.5 gap-1.5 text-xs"
             onClick={() => fileInputRef.current?.click()}
             disabled={isLoading}
             title="Upload sketch or photo"
@@ -405,7 +405,7 @@ export function DrawingCanvas({
             type="button"
             onClick={handleClear}
             disabled={!hasDrawn || isLoading}
-            className="icon-btn !h-8 !px-2.5 text-xs text-zinc-400 hover:!text-rose-300 hover:!bg-rose-500/10"
+            className="icon-btn !h-8 !px-2.5 text-xs"
             title="Clear canvas"
           >
             Clear
@@ -414,8 +414,8 @@ export function DrawingCanvas({
       </div>
 
       {/* Preset Doodles Strip */}
-      <div className="px-3 py-1.5 border-b border-white/[0.05] bg-black/20 flex items-center gap-1.5 overflow-x-auto shrink-0 select-none no-scrollbar">
-        <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider pl-1 shrink-0">Presets:</span>
+      <div className="px-3 py-1.5 border-b border-line bg-surface-2 flex items-center gap-1.5 overflow-x-auto shrink-0 select-none no-scrollbar">
+        <span className="text-[11px] font-semibold text-fg-muted uppercase tracking-wider pl-1 shrink-0">Presets:</span>
         {PRESETS.map((p) => (
           <button
             key={p.id}
@@ -424,8 +424,8 @@ export function DrawingCanvas({
             disabled={isLoading}
             className={`h-6 px-2.5 rounded-full text-xs shrink-0 inline-flex items-center gap-1.5 border transition-all ${
               activePreset === p.id
-                ? "bg-brand-500/25 text-brand-200 border-brand-400/50 shadow-sm"
-                : "text-zinc-400 border-white/[0.06] hover:text-zinc-200 hover:border-white/20 bg-white/[0.02]"
+                ? "bg-fg text-canvas border-fg shadow-sm"
+                : "text-fg-muted border-line hover:text-fg hover:border-line-strong bg-surface"
             }`}
           >
             <span>{p.emoji}</span>
@@ -459,20 +459,20 @@ export function DrawingCanvas({
         />
 
         {isDraggingOver && (
-          <div className="absolute inset-4 rounded-2xl bg-brand-600/20 backdrop-blur-md border-2 border-dashed border-brand-400 flex flex-col items-center justify-center text-brand-200 gap-2 z-20 animate-fade-in">
+          <div className="absolute inset-4 rounded-2xl bg-surface/80 backdrop-blur-md border-2 border-dashed border-fg flex flex-col items-center justify-center text-fg gap-2 z-20 animate-fade-in">
             <span className="text-3xl">📥</span>
             <span className="font-semibold text-base">Drop your image here</span>
-            <span className="text-xs text-brand-300/80">Supports PNG, JPG, WebP</span>
+            <span className="text-xs text-fg-muted">Supports PNG, JPG, WebP</span>
           </div>
         )}
 
         {!hasDrawn && !isDraggingOver && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none select-none p-6 text-center gap-2">
-            <div className="w-12 h-12 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-2xl text-zinc-400 shadow-inner">
+            <div className="w-12 h-12 rounded-2xl bg-surface border border-line flex items-center justify-center text-2xl text-fg-muted shadow-inner">
               ✏️
             </div>
-            <p className="text-sm font-medium text-zinc-300">Sketch anything here</p>
-            <p className="text-xs text-zinc-500 max-w-xs leading-relaxed">
+            <p className="text-sm font-medium text-fg">Sketch anything here</p>
+            <p className="text-xs text-fg-faint max-w-xs leading-relaxed">
               Click a preset doodle above, drag in an image, or use the pen to start drawing
             </p>
           </div>
@@ -480,10 +480,10 @@ export function DrawingCanvas({
       </div>
 
       {/* Modern Bottom Command Dock */}
-      <div className="p-3 border-t border-white/[0.08] bg-studio-950/90 backdrop-blur shrink-0 space-y-2.5 z-10">
+      <div className="p-3 border-t border-line bg-canvas/90 backdrop-blur shrink-0 space-y-2.5 z-10">
         {/* Style chips */}
         <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
-          <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider pl-1 shrink-0">Style:</span>
+          <span className="text-[11px] font-semibold text-fg-muted uppercase tracking-wider pl-1 shrink-0">Style:</span>
           {STYLE_CHIPS.map((chip) => {
             const on = prompt.toLowerCase().includes(chip);
             return (
@@ -494,8 +494,8 @@ export function DrawingCanvas({
                 disabled={isLoading || on}
                 className={`h-5 px-2 rounded-md text-[11px] shrink-0 border transition-all ${
                   on
-                    ? "bg-brand-500/20 text-brand-200 border-brand-400/40"
-                    : "text-zinc-400 border-white/[0.06] hover:text-zinc-200 hover:border-white/20"
+                    ? "bg-fg text-canvas border-fg"
+                    : "text-fg-muted border-line hover:text-fg hover:border-line-strong"
                 }`}
               >
                 {on ? "✓" : "+"} {chip}
@@ -513,11 +513,11 @@ export function DrawingCanvas({
             placeholder="Describe your model (e.g. ceramic mug, low poly)"
             disabled={isLoading}
             aria-label="Prompt"
-            className="flex-1 min-w-0 h-11 bg-black/40 border border-white/[0.1] rounded-xl px-3.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-brand-400 focus:ring-1 focus:ring-brand-400 transition disabled:opacity-50"
+            className="flex-1 min-w-0 h-11 bg-surface border border-line rounded-xl px-3.5 text-sm text-fg placeholder:text-fg-faint focus:outline-none focus:border-fg focus:ring-1 focus:ring-fg transition disabled:opacity-50"
           />
 
           <label
-            className="shrink-0 h-11 px-3 inline-flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.02] text-xs text-zinc-300 cursor-pointer select-none hover:bg-white/[0.05]"
+            className="shrink-0 h-11 px-3 inline-flex items-center gap-2 rounded-xl border border-line bg-surface text-xs text-fg cursor-pointer select-none hover:bg-surface-2"
             title="Automatically isolate your subject before generating 3D"
           >
             <input
@@ -525,7 +525,7 @@ export function DrawingCanvas({
               checked={removeBackground}
               onChange={(e) => setRemoveBackground(e.target.checked)}
               disabled={isLoading}
-              className="accent-brand-500 w-3.5 h-3.5"
+              className="accent-fg w-3.5 h-3.5"
             />
             <span className="hidden sm:inline">Remove BG</span>
             <span className="sm:hidden">BG</span>
@@ -539,13 +539,13 @@ export function DrawingCanvas({
           >
             {isLoading ? (
               <span className="flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-canvas/40 border-t-canvas rounded-full animate-spin" />
                 <span className="hidden sm:inline">Generating…</span>
               </span>
             ) : (
               <span className="flex items-center gap-2">
                 <span>Generate 3D</span>
-                <kbd className="hidden md:inline-flex items-center h-5 px-1.5 rounded bg-white/20 text-[10px] font-mono">
+                <kbd className="hidden md:inline-flex items-center h-5 px-1.5 rounded bg-canvas/20 text-[10px] font-mono">
                   Ctrl ↵
                 </kbd>
               </span>

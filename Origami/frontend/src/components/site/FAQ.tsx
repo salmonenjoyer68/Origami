@@ -34,23 +34,23 @@ export function FAQ() {
         <div>
           <span className="reveal eyebrow">FAQ</span>
           <h2 className="reveal heading-lg text-gradient mt-4">Questions, answered</h2>
-          <p className="reveal mt-4 text-zinc-400 leading-relaxed">
+          <p className="reveal mt-4 text-fg-muted leading-relaxed">
             Anything else? Check the README in the repository for setup and API details.
           </p>
         </div>
 
-        <div className="reveal divide-y divide-white/[0.06] border-y border-white/[0.06]">
+        <div className="reveal divide-y divide-line border-y border-line">
           {FAQS.map((f) => (
             <details key={f.q} className="group py-5">
-              <summary className="flex items-center justify-between gap-6 cursor-pointer text-white font-medium hover:text-brand-200 transition-colors">
+              <summary className="flex items-center justify-between gap-6 cursor-pointer text-fg font-medium hover:opacity-70 transition-opacity">
                 {f.q}
-                <span className="shrink-0 w-7 h-7 rounded-full border border-white/10 flex items-center justify-center text-zinc-400 group-open:rotate-45 group-open:text-brand-300 group-open:border-brand-400/40 transition-all">
+                <span className="shrink-0 w-7 h-7 rounded-full border border-line flex items-center justify-center text-fg-muted group-open:rotate-45 group-open:text-fg group-open:border-fg transition-all">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeWidth={2} d="M12 5v14M5 12h14" />
                   </svg>
                 </span>
               </summary>
-              <p className="mt-3 pr-12 text-sm text-zinc-400 leading-relaxed">{f.a}</p>
+              <p className="mt-3 pr-12 text-sm text-fg-muted leading-relaxed">{f.a}</p>
             </details>
           ))}
         </div>

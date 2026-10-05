@@ -35,21 +35,21 @@ export function HowItWorks() {
 
       <ol className="relative mt-16 grid md:grid-cols-3 gap-5">
         <div
-          className="hidden md:block absolute top-[52px] left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-brand-400/40 to-transparent"
+          className="hidden md:block absolute top-[52px] left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-line-strong to-transparent"
           aria-hidden="true"
         />
         {STEPS.map((s, i) => (
           <li key={s.n} className="reveal card p-7 relative" style={{ transitionDelay: `${i * 100}ms` }}>
             <div className="flex items-center justify-between">
-              <div className="w-12 h-12 rounded-xl bg-brand-500/10 border border-brand-400/20 flex items-center justify-center text-brand-300 relative z-10 bg-studio-900">
+              <div className="w-12 h-12 rounded-xl bg-surface border border-line flex items-center justify-center text-fg relative z-10">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d={s.icon} />
                 </svg>
               </div>
-              <span className="font-mono text-sm text-zinc-600">{s.n}</span>
+              <span className="font-mono text-sm text-fg-faint">{s.n}</span>
             </div>
-            <h3 className="mt-6 font-display text-lg font-semibold text-white">{s.title}</h3>
-            <p className="mt-2 text-sm text-zinc-400 leading-relaxed">{s.body}</p>
+            <h3 className="mt-6 font-display text-lg font-semibold text-fg">{s.title}</h3>
+            <p className="mt-2 text-sm text-fg-muted leading-relaxed">{s.body}</p>
           </li>
         ))}
       </ol>

@@ -24,16 +24,16 @@ export function Navbar({ backendOnline }: { backendOnline: boolean | null }) {
 
   const status =
     backendOnline === true
-      ? { dot: "bg-emerald-400", text: "Engine online" }
+      ? { dot: "bg-fg", text: "Engine online" }
       : backendOnline === false
-      ? { dot: "bg-rose-500", text: "Engine offline" }
-      : { dot: "bg-amber-400 animate-pulse", text: "Connecting…" };
+      ? { dot: "bg-canvas border border-fg", text: "Engine offline" }
+      : { dot: "bg-fg-faint animate-pulse", text: "Connecting…" };
 
   return (
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
         scrolled || open
-          ? "bg-studio-950/80 backdrop-blur-xl border-b border-white/[0.06]"
+          ? "bg-canvas/80 backdrop-blur-xl border-b border-line"
           : "bg-transparent border-b border-transparent"
       }`}
     >
@@ -47,7 +47,7 @@ export function Navbar({ backendOnline }: { backendOnline: boolean | null }) {
             <li key={l.href}>
               <a
                 href={l.href}
-                className="px-3 py-2 rounded-full text-sm text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-colors"
+                className="px-3 py-2 rounded-full text-sm text-fg-muted hover:text-fg hover:bg-surface-2 transition-colors"
               >
                 {l.label}
               </a>
@@ -57,7 +57,7 @@ export function Navbar({ backendOnline }: { backendOnline: boolean | null }) {
 
         <div className="flex items-center gap-3">
           <span
-            className="hidden sm:inline-flex items-center gap-2 h-8 px-3 rounded-full border border-white/[0.08] bg-white/[0.03] text-xs text-zinc-400"
+            className="hidden sm:inline-flex items-center gap-2 h-8 px-3 rounded-full border border-line bg-surface text-xs text-fg-muted"
             title="FastAPI backend status (port 8000)"
           >
             <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
@@ -85,14 +85,14 @@ export function Navbar({ backendOnline }: { backendOnline: boolean | null }) {
       </nav>
 
       {open && (
-        <div className="md:hidden border-t border-white/[0.06] px-5 pb-5 pt-2 animate-fade-in">
+        <div className="md:hidden border-t border-line px-5 pb-5 pt-2 animate-fade-in">
           <ul className="flex flex-col">
             {LINKS.map((l) => (
               <li key={l.href}>
                 <a
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block py-3 text-sm text-zinc-300 hover:text-white border-b border-white/[0.04]"
+                  className="block py-3 text-sm text-fg-muted hover:text-fg border-b border-line"
                 >
                   {l.label}
                 </a>

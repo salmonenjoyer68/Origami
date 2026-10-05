@@ -129,7 +129,7 @@ export default function OrigamiStudioPage() {
   }, []);
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-studio-950 text-zinc-100 overflow-hidden font-sans">
+    <div className="h-screen w-screen flex flex-col bg-canvas text-fg overflow-hidden font-sans">
       {/* Header */}
       <StudioHeader
         backendOnline={backendOnline}
@@ -139,16 +139,16 @@ export default function OrigamiStudioPage() {
 
       {/* Status / Alert Banners */}
       {(error || isPreview) && (
-        <div className="shrink-0 px-4 py-2 text-xs flex items-center justify-between gap-3 border-b border-white/[0.08] bg-black/40 backdrop-blur z-20">
+        <div className="shrink-0 px-4 py-2 text-xs flex items-center justify-between gap-3 border-b border-line bg-surface backdrop-blur z-20">
           {error && (
-            <div className="flex items-center gap-2 text-rose-300">
-              <span className="font-semibold text-rose-400">Error:</span>
+            <div className="flex items-center gap-2 text-fg">
+              <span className="font-semibold uppercase tracking-wider text-[11px]">Error:</span>
               <span className="truncate">{error}</span>
             </div>
           )}
           {!error && isPreview && (
-            <div className="flex items-center gap-2 text-amber-300">
-              <span className="font-semibold text-amber-400">Notice:</span>
+            <div className="flex items-center gap-2 text-fg">
+              <span className="font-semibold uppercase tracking-wider text-[11px]">Notice:</span>
               <span>GPU queue is busy, displaying preview demo mesh. Real generation will retry when queue clears.</span>
             </div>
           )}
@@ -158,7 +158,7 @@ export default function OrigamiStudioPage() {
               setError(null);
               setIsPreview(false);
             }}
-            className="icon-btn !h-6 !px-2 text-[11px] text-zinc-400 hover:text-white"
+            className="icon-btn !h-6 !px-2 text-[11px]"
           >
             Dismiss
           </button>
@@ -166,7 +166,7 @@ export default function OrigamiStudioPage() {
       )}
 
       {/* Main Studio Dual-Pane Viewport */}
-      <main className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-white/[0.08] overflow-hidden">
+      <main className="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-line overflow-hidden">
         {/* Left Column: 2D Canvas */}
         <div className="h-full min-h-0 overflow-hidden">
           <DrawingCanvas

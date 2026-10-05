@@ -9,8 +9,8 @@ const DynamicModelViewer = dynamic<ModelViewerProps>(() => import("./ModelViewer
   ssr: false,
   loading: () => (
     <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-      <div className="w-8 h-8 border-2 border-brand-500/30 border-t-brand-400 rounded-full animate-spin" />
-      <span className="text-xs text-zinc-500">Starting 3D viewport…</span>
+      <div className="w-8 h-8 border-2 border-line-strong border-t-fg rounded-full animate-spin" />
+      <span className="text-xs text-fg-faint">Starting 3D viewport…</span>
     </div>
   ),
 });
@@ -32,8 +32,8 @@ const STAGES = [
 
 const LIGHTS: { id: LightingMode; label: string }[] = [
   { id: "studio", label: "Studio" },
-  { id: "neon", label: "Neon" },
-  { id: "warm", label: "Warm" },
+  { id: "contrast", label: "Contrast" },
+  { id: "rim", label: "Rim" },
   { id: "clay", label: "Clay" },
 ];
 
@@ -84,12 +84,12 @@ export function Viewport3D({
 
   return (
     <div
-      className={`flex flex-col bg-studio-950 overflow-hidden ${
-        isFullscreen ? "fixed inset-3 sm:inset-6 z-[60] rounded-2xl border border-white/10 shadow-2xl" : "w-full h-full"
+      className={`flex flex-col bg-canvas overflow-hidden ${
+        isFullscreen ? "fixed inset-3 sm:inset-6 z-[60] rounded-2xl border border-line shadow-2xl" : "w-full h-full"
       }`}
     >
       {/* Toolbar */}
-      <div className="px-3 h-12 border-b border-white/[0.06] flex items-center justify-between gap-2 bg-studio-900">
+      <div className="px-3 h-12 border-b border-line flex items-center justify-between gap-2 bg-surface">
         <div className="segmented" role="radiogroup" aria-label="Lighting">
           {LIGHTS.map((l) => (
             <button
@@ -108,7 +108,7 @@ export function Viewport3D({
         <div className="flex items-center gap-1">
           <button
             type="button"
-            className={`icon-btn text-xs font-medium ${wireframe ? "!text-brand-200 !bg-brand-500/15" : ""}`}
+            className={`icon-btn text-xs font-medium ${wireframe ? "!text-canvas !bg-fg" : ""}`}
             onClick={() => setWireframe((v) => !v)}
             aria-pressed={wireframe}
             title="Toggle wireframe"
@@ -119,7 +119,7 @@ export function Viewport3D({
           </button>
           <button
             type="button"
-            className={`icon-btn ${autoRotate ? "!text-brand-200 !bg-brand-500/15" : ""}`}
+            className={`icon-btn ${autoRotate ? "!text-canvas !bg-fg" : ""}`}
             onClick={() => setAutoRotate((v) => !v)}
             aria-pressed={autoRotate}
             title="Toggle auto-rotate"
@@ -147,7 +147,7 @@ export function Viewport3D({
       </div>
 
       {/* Canvas */}
-      <div className="relative flex-1 min-h-0 bg-[radial-gradient(ellipse_at_center,#1a1a22_0%,#070709_70%)]">
+      <div className="relative flex-1 min-h-0 viewport-bg">
         <DynamicModelViewer
           modelUrl={modelUrl}
           isLoading={isLoading}
@@ -160,7 +160,7 @@ export function Viewport3D({
         />
 
         {/* Overlays */}
-        <div className="absolute top-3 left-3 segmented !bg-studio-950/70 backdrop-blur" aria-label="Camera view">
+        <div className="absolute top-3 left-3 segmented !bg-canvas/70 backdrop-blur" aria-label="Camera view">
           {(["iso", "front", "top"] as const).map((p) => (
             <button key={p} type="button" onClick={() => snap(p)} className="!h-6 !px-2 !text-[11px] capitalize">
               {p === "iso" ? "Iso" : p}
@@ -169,21 +169,21 @@ export function Viewport3D({
         </div>
 
         {detectedLabel && !isLoading && (
-          <span className="absolute top-3 right-3 max-w-[55%] truncate h-7 px-3 inline-flex items-center rounded-full bg-studio-950/70 backdrop-blur border border-brand-400/25 text-xs font-medium text-brand-200">
+          <span className="absolute top-3 right-3 max-w-[55%] truncate h-7 px-3 inline-flex items-center rounded-full bg-canvas/70 backdrop-blur border border-line text-xs font-medium text-fg">
             {detectedLabel}
           </span>
         )}
 
         {!modelUrl && !isLoading && (
           <div className="absolute bottom-4 inset-x-0 flex flex-col items-center gap-2 z-10 px-4 text-center">
-            <p className="text-xs text-zinc-500">
+            <p className="text-xs text-fg-faint">
               Your model will appear here · drag to orbit · scroll to zoom
             </p>
             {onLoadSample && (
               <button
                 type="button"
                 onClick={onLoadSample}
-                className="btn-secondary !h-8 !px-3.5 !text-xs !bg-brand-500/10 !border-brand-500/30 !text-brand-300 hover:!bg-brand-500/20 active:scale-95 transition-all shadow-sm"
+                className="btn-secondary !h-8 !px-3.5 !text-xs active:scale-95 transition-all shadow-sm"
               >
                 <span>⚡</span>
                 <span>Load Demo 3D Model</span>
@@ -193,11 +193,11 @@ export function Viewport3D({
         )}
 
         {isLoading && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-studio-950/80 backdrop-blur-md p-6 animate-fade-in">
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-canvas/85 backdrop-blur-md p-6 animate-fade-in">
             <div className="w-full max-w-xs">
               <div className="flex items-baseline justify-between mb-5">
-                <h4 className="font-display text-base font-semibold text-white">Generating</h4>
-                <span className="font-mono text-sm text-brand-300 tabular-nums">{elapsedSeconds}s</span>
+                <h4 className="font-display text-base font-semibold text-fg">Generating</h4>
+                <span className="font-mono text-sm text-fg tabular-nums">{elapsedSeconds}s</span>
               </div>
               <ol className="space-y-4">
                 {STAGES.map((s, i) => {
@@ -208,10 +208,10 @@ export function Viewport3D({
                       <span
                         className={`mt-0.5 w-5 h-5 shrink-0 rounded-full flex items-center justify-center border ${
                           done
-                            ? "bg-emerald-500/20 border-emerald-400/50 text-emerald-300"
+                            ? "bg-fg border-fg text-canvas"
                             : active
-                            ? "border-brand-400"
-                            : "border-white/15"
+                            ? "border-fg"
+                            : "border-line-strong"
                         }`}
                       >
                         {done ? (
@@ -219,20 +219,20 @@ export function Viewport3D({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                           </svg>
                         ) : active ? (
-                          <span className="w-2.5 h-2.5 border-2 border-brand-300/40 border-t-brand-300 rounded-full animate-spin" />
+                          <span className="w-2.5 h-2.5 border-2 border-line-strong border-t-fg rounded-full animate-spin" />
                         ) : null}
                       </span>
                       <div>
-                        <p className={`text-sm ${done || active ? "text-white" : "text-zinc-500"}`}>{s.label}</p>
-                        <p className="text-xs text-zinc-500">{s.sub}</p>
+                        <p className={`text-sm ${done || active ? "text-fg" : "text-fg-faint"}`}>{s.label}</p>
+                        <p className="text-xs text-fg-faint">{s.sub}</p>
                       </div>
                     </li>
                   );
                 })}
               </ol>
-              <div className="mt-6 h-1 rounded-full bg-white/[0.06] overflow-hidden">
+              <div className="mt-6 h-1 rounded-full bg-line overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-brand-500 to-violet-400 transition-all duration-1000"
+                  className="h-full bg-fg transition-all duration-1000"
                   style={{ width: `${Math.min(95, (elapsedSeconds / 40) * 100)}%` }}
                 />
               </div>
@@ -242,16 +242,16 @@ export function Viewport3D({
       </div>
 
       {/* Footer */}
-      <div className="px-3 h-14 border-t border-white/[0.06] flex items-center justify-between gap-2 bg-studio-900">
+      <div className="px-3 h-14 border-t border-line flex items-center justify-between gap-2 bg-surface">
         <div className="text-xs min-w-0">
           {modelUrl ? (
-            <span className="inline-flex items-center gap-2 text-emerald-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="inline-flex items-center gap-2 text-fg">
+              <span className="w-1.5 h-1.5 rounded-full bg-fg" />
               Ready
-              {inferenceTime != null && <span className="text-zinc-500 font-mono">· {inferenceTime.toFixed(1)}s</span>}
+              {inferenceTime != null && <span className="text-fg-faint font-mono">· {inferenceTime.toFixed(1)}s</span>}
             </span>
           ) : (
-            <span className="text-zinc-500">No model yet</span>
+            <span className="text-fg-faint">No model yet</span>
           )}
         </div>
         <div className="flex items-center gap-2">

@@ -29,7 +29,11 @@ Open **`http://localhost:3000`** in your browser.
 ---
 
 ## Project Structure
-- `Origami/frontend/` - Next.js 14 web app, Three.js 3D viewport, and drawing canvas.
-- `Origami/backend/` - FastAPI service handling image processing, Gemini conditioning, and 3D mesh generation.
+- `Origami/frontend/` - Next.js studio with drawing canvas and Three.js/WebGL 3D viewport.
+- `Origami/backend/` - FastAPI orchestration for Gemini conditioning and Hugging Face 3D generation.
 - `run-studio.bat` - 1-click launcher for Windows.
 - `run-studio.ps1` - PowerShell launcher.
+
+### Configuration & Sample Assets
+- To configure the backend locally, copy your credentials into `Origami/backend/.env` using `Origami/backend/.env.example` as a template.
+- Binary sample models can be added under `Origami/frontend/public/samples/`.

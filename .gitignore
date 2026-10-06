@@ -1,0 +1,14 @@
+# Root .gitignore
+*.log
+Origami/backend/*.log
+Origami/frontend/*.log
+node_modules/
+.venv/
+venv/
+.env
+.env*.local
+__pycache__/
+*.pyc
+.next/
+dist/
+build/
